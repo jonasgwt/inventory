@@ -1,4 +1,4 @@
-# Inventory Management System
+# ![alt text](https://playground.nhhs-sjb.org/static/inventoryresource/logo.png)Inventory Management System
 
 ## Description
 
