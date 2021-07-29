@@ -1,6 +1,6 @@
-# <img src="https://playground.nhhs-sjb.org/static/inventoryresource/logo.png" alt="drawing" width="50"/>
+# <img src="https://playground.nhhs-sjb.org/static/inventoryresource/logo.png" alt="drawing" width="75"/>
 
-#Inventory Management System
+# Inventory Management System
 
 ## Description
 
