@@ -1,0 +1,633 @@
+{% extends "inventory/template.html" %}
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1">
+{% endblock head_meta %}
+{% block body %}
+{% load new_tags %}
+<style>
+    @media screen and (max-width: 1000px) {
+        #bigscreenlogo{
+            display: none;
+        }
+        #bigscreenuser{
+            display: none;
+        }
+        #smallscreenlogo{
+            display: block!important;
+        }
+        #smallscreenuser{
+            display: block!important;
+        }
+    }
+    .kititemcontainer {
+        display: flex;
+        border-radius: 50px;
+        border: 1px solid #d3d3d3;
+        padding: 2vw;
+        margin-top: 30px;
+        align-items: center;
+        background-color: #c59400!important;
+        position: relative;
+    }
+    menu, ol, ul, li {
+        list-style-type: disc;
+    }
+    #addbutton:hover{
+        color: gray;
+    }
+    #removefromtempcartbutton:hover{
+        color: #6b0e17!important;
+    }
+    .kititemcontainermobile{
+        display: grid;
+        grid-template-columns: auto auto auto;
+        grid-column-gap:2vw;
+        border-radius: 5vw;
+        border: 1px solid #d3d3d3;
+        padding: 2vw;
+        align-items: center;
+        background-color: #c59400!important;
+    }
+</style>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </symbol>
+    <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+    </symbol>
+    <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </symbol>
+</svg>
+
+<nav class="navbar navbar-dark bg-dark" style="position:fixed;top: 0;width: 100%;flex-wrap: nowrap; z-index: 50;" id="topnavbar">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <div id="bigscreenlogo">
+            <a class="navbar-brand" href="{%url 'kits_list'%}" style="display: flex;" >
+                <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                <p class="lead" style="margin: auto; font-size: 20px;">Inventory Management System</p>
+            </a>
+        </div>
+        <div id="smallscreenlogo" style="display: none;">
+            <a class="navbar-brand" href="{%url 'kits_list'%}" style="display: flex;">
+                <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                <p class="lead" style="margin: auto; font-size: 20px;">IMS</p>
+            </a>
+        </div>
+        <div style="display: flex;">
+        <!-- Logged in user -->
+            <div id="bigscreenuser">
+                <span class="navbar-text" style="margin-right: 20px;text-overflow: clip;white-space: nowrap;">
+                    Logged in as {{user.username}}
+                </span>
+            </div>
+            <div id="smallscreenuser" style="display: none;">
+                <span class="navbar-text" style="margin-right: 20px;text-overflow: clip;white-space: nowrap;">
+                    {{user.username}}
+                </span>
+            </div>
+            <!-- Cart -->
+            <a href="{%url 'kits_activecart'%}" style="display: flex;align-items: center;margin-right: 20px;position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="color:rgb(255 255 255 / 55%);">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                {%if numitemsinkitcart != 0%}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="margin-top:10px;">
+                    {{numitemsinkitcart}}
+                </span>
+                {%endif%}
+            </a>
+            <!-- Log out -->
+            <a href="{%url 'logout_view'%}" style="display: flex;align-items: center;">
+                <button type="button" class="btn btn-outline-secondary" style="color: rgb(255 255 255 / 55%);border-radius: 25px; margin-right: 5px;height: 30px;display: flex;align-items: center;">Logout</button>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Nav Bar -->
+<!-- Top Menu bar -->
+<nav class="navbar navbar-dark bg-dark" style="position:fixed;top: 0;width: 100%;flex-wrap: nowrap;z-index: 10;display: none;" id="mobilenavbar">
+    <div class="container-fluid">
+        <div id="smallscreenlogo">
+            <a class="navbar-brand" href="{%url 'kits_list'%}" style="display: flex;">
+                <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                <p class="lead" style="margin: auto; font-size: 20px;">IMS</p>
+            </a>
+        </div>
+        <div style="display: flex;">
+            <!-- Menu Icon -->
+            <div onclick="showmenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="align-self: center;">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- Menu -->
+<div style="background-color: rgba(0, 0, 0, 0.473);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;display: none;" onclick="closemenu()" id="overlay"></div>
+<div id="menu" style="position: fixed;overflow: auto; height: 100%; right: 0;top: 0;z-index: 100;padding: 5vw 15vw;-webkit-backdrop-filter: blur(6vw);backdrop-filter: blur(6vw);background-color: #2125299d;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);transform: translateX(100vw);">
+    <div id="topsearchnavibar" style="display: flex;flex-direction: column;">
+        <a href="{%url 'kits_list'%}">
+            <button type="button" class="btn btn-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Back to Kit List</button>
+        </a>
+        <a href="{%url 'orderlogs'%}">
+        <button type="button" class="btn btn-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">View Logs</button>
+        </a>
+        <a href="{%url 'logout_view_sjb'%}">
+            <button type="button" class="btn btn-danger" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Logout</button>
+        </a>
+        <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+    </div>
+</div>
+
+<!-- PC Content-->
+<div style="display: flex;justify-content: center;padding: 60px;flex-direction: column;align-items: center;" id="content">
+    <div style="margin-top: 20px;">
+        {%if item.image is None%}
+            <img src="/static/inventoryresource/logo.png" style="width: 200px; height: 200px;display: block;margin: auto;object-fit: cover;">
+        {%else%}
+            <img src="/static/inventoryresource/{{item.image}}" style="width: 200px; height: 200px;display: block;margin: auto;object-fit: cover;">
+        {%endif%}
+        <div id="infodiv" style="text-align: center;">
+            <h1 class="display-3" style="margin-bottom: 10px;margin-top: 10px;">Kit {{item.name}}</h1>
+            <p class="lead" style="font-size: 25px;">Expiry: {{item.nearest_expiry}}</p>
+            {%if item.kitloancartitem.last.loanee_name != None%}
+                <p class="lead" style="font-size: 25px;">Loaned to {{item.kitloancartitem.last.loanee_name}}</p>
+                <p class="lead" style="font-size: 25px;">Loan Started On {{item.kitloancartitem.last.time}}</p>
+                <p class="lead" style="font-size: 25px;">Loan Expiring On {{item.kitloancartitem.last.loan_end_date}}</p>
+            {%endif%}
+            <p id="errors" class="lead" style="color: rgb(199, 0, 0);margin-top: 20px;"></p>
+        </div>
+    </div>
+    {%if stage == "prechoice"%}
+        <form action="{%url 'kits_return' item.name%}" method="POST">
+            {%csrf_token%}
+            <div style="margin-top: 50px;">
+                <div class="alert alert-warning d-flex align-items-center" role="alert" style="display: flex;flex-direction: column;align-items: flex-start!important;width: 650px;">
+                    <div>
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                        <strong>Check! Are Any Items Expanded?</strong>
+                    </div>
+                    <hr style="width: 550px;">
+                    <p><strong>You Should Have:</strong></p>
+                    {%for kititem in item.items.all%}
+                    <ul>    
+                        <li class="mb-0">{{kititem.quantity_max}}x {{kititem.item.name}}</li>
+                    </ul>
+                    {%endfor%}
+                </div>
+            </div>
+        </form>
+        <div style="display: flex;flex-direction: column;">
+            {%if not item.forced%}
+            <button type="button" class="btn btn-success" onclick="noexpanded()" style="margin-bottom: 20px;">No Items Expanded! Return Now!</button>
+            {%endif%}
+            <button type="button" class="btn btn-danger" onclick="expanded()" style="margin-bottom: 20px;">Some Items Expanded!</button>
+        </div>
+    {%elif stage == "expanded"%}
+    <h1 style="margin-top: 50px;" class="display-5">Indicate Expanded Items</h1>
+    <div style="display: flex;flex-direction: row; align-items: center;width: 800px;">
+        <div class="kititemcontainer">
+            <div style="width: 200px; height: 150px;margin-left: 20px;">
+                {%if targetkititem.item.image is None%}
+                    <img src="/static/inventoryresource/logo.png" style="width: 150px; height: 150px;object-fit: cover;">
+                {%else%}
+                    <img src="/static/inventoryresource/{{targetkititem.item.image}}" style="width: 150px; height: 150px;object-fit: cover;">
+                {%endif%}
+            </div>
+            <div class="form-floating" style="margin-left: 5%;padding-right: 5%;width: 100%;border-right: white 1px solid;">
+                {%csrf_token%}
+                <select class="form-select" id="selectkititem" aria-label="Floating label select example" required style="height: 62px;" onchange="changeselector()">
+                {%if targetkititem != None%}
+                    {%for kititemexpiry in item.itemsexpiry.all|filternsort%}
+                        {%if kititemexpiry.id == targetkititem.id%}
+                            <option value="{{kititemexpiry.id}}" selected>{{kititemexpiry.expirydate.item.name}} | Expiry; {{kititemexpiry.expirydate.expirydate}}</option>
+                        {%else%}
+                            <option value="{{kititemexpiry.id}}">{{kititemexpiry.expirydate.item.name}} | Expiry; {{kititemexpiry.expirydate.expirydate}}</option>
+                        {%endif%}
+                    {%endfor%}
+                {%else%}
+                    <option selected>Open this select menu</option>
+                        {%for kititemexpiry in item.itemsexpiry.all|filternsort%}
+                            <option value="{{kititemexpiry.id}}">{{kititemexpiry.expirydate.item.name}} | Expiry; {{kititemexpiry.expirydate.expirydate}} </option>
+                        {%endfor%}
+                {%endif%}
+                </select>
+                <label for="selectkititem" style="color: black;">Select Expanded Items</label>
+            </div>
+            <div style="margin-left: 4%;margin-right: 4%;width:60%;text-align: center;">
+                <p class="lead" style="font-size: 19px;">Qty Expanded</p>
+                <div style="text-align: center;align-items: center;justify-content: center;display: flex;flex-direction: row;">
+                    {%if targetkititem != None%}
+                        {%if max_qty == 0%}
+                        <input type="number" style="width: 40px; border: none; border-radius: 10px; text-align: right;" disabled min=1 value="0" max="{{max_qty}}" id="qtyexpanded">
+                        <p class="lead" style="font-size: 19px;margin-left: 7px;">/ {{max_qty}}</p>
+                        {%else%}
+                        <input type="number" style="width: 40px; border: none; border-radius: 10px; text-align: right;" required min=1 value="1" max="{{max_qty}}" id="qtyexpanded">
+                        <p class="lead" style="font-size: 19px;margin-left: 7px;">/ {{max_qty}}</p>
+                        {%endif%}
+                    {%else%}
+                        <input type="number" style="width: 40px; border: none; border-radius: 10px; text-align: right;" required min=0 value="0" disabled>
+                        <p class="lead" style="font-size: 19px;margin-left: 7px;">/ 0</p>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px;margin-left: 20px;">
+            <a onclick="addtotempcart()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16" id="addbutton">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: column;justify-content: center;align-items: center; width: 800px;">
+        {%for item_in_tempcart in items_in_tempcart%}
+        <div style="display: flex;flex-direction: row; align-items: center;">
+            <div class="kititemcontainer" style="background-color: #75151e!important;">
+                {%if item_in_tempcart.compulsory%}
+                <p style="position: absolute;left: 50%;transform: translateX(-50%);top:10px;color: rgba(255,255,255,.55);">Expanded From Previous Loan</p>
+                {%endif%}
+                <div style="width: 200px; height: 150px;margin-left: 20px;">
+                    {%if item_in_tempcart.item.image is None%}
+                        <img src="/static/inventoryresource/logo.png" style="width: 150px; height: 150px;object-fit: cover;">
+                    {%else%}
+                        <img src="/static/inventoryresource/{{kititem.kit.image}}" style="width: 150px; height: 150px;object-fit: cover;">
+                    {%endif%}
+                </div>
+                <div style="margin-left: 8%;padding-right: 4%;width: 100%;border-right: white 1px solid;">
+                    <p class="lead" style="font-size: 22px;">{{item_in_tempcart.item.item.name}}</p>
+                    <p class="lead" style="font-size: 19px;">Expanded Qty: <p>{{item_in_tempcart.expanded_qty}}x {{item_in_tempcart.item.item.name}} expiring on {{item_in_tempcart.item_in_kit.expirydate.expirydate}}</p></p>
+                </div>
+                <div style="margin-left: 4%;margin-right: 4%;width:100%;text-align: center;">
+                    <p class="lead" style="font-size: 19px;">You Should Have <strong>{{item_in_tempcart|findremainder}}</strong> {{item_in_tempcart.item.item.name}} Left In Your Kit</p>
+                </div>
+            </div>
+            {%if not item_in_tempcart.compulsory%}
+            <div style="margin-top: 30px;margin-left: 20px;">
+                <a onclick="removetempcart('{{item_in_tempcart.id}}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16" id="removefromtempcartbutton" style="color: #dc3545;">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                    </svg>
+                </a>
+            </div>
+            {%endif%}
+        </div>
+        {%endfor%}
+    </div>
+    {%if items_in_tempcart%}
+        <div style="display: flex;flex-direction: column;width: 250px;margin-top: 50px;">
+            {%if items_in_tempcart|check%}
+            <button type="button" class="btn btn-warning" style="margin-bottom: 20px;" onclick="autostock()">Return Kit and Auto-Stock</button>
+            {%endif%}
+            <button type="button" class="btn btn-danger" style="margin-bottom: 20px;" onclick="stocklater()">Return Kit and Stock Later</button>
+        </div>
+    {%endif%}
+    {%endif%}
+</div>
+
+<!-- Mobile Content-->
+<div id="mobilecontent" style="display: none;width: 100%;margin-bottom: 10vw;">
+    <div style="display: flex;justify-content: center;padding: 60px;padding-bottom:0px;flex-direction: column;align-items: center;" id="content">
+        <div style="margin-top: 20px;">
+            {%if item.image is None%}
+                <img src="/static/inventoryresource/logo.png" style="width: 40vw;height: 40vw;display: block;margin: auto;object-fit: cover;">
+            {%else%}
+                <img src="/static/inventoryresource/{{item.image}}" style="width: 40vw;height: 40vw;display: block;margin: auto;object-fit: cover;">
+            {%endif%}
+            <div id="infodiv" style="text-align: center;">
+                <h1 class="display-3" style="margin-bottom: 2vw;margin-top: 2vw;font-size: 7vw;">Kit {{item.name}}</h1>
+                <p class="lead" style="font-size: 5vw;">Expiry: {{item.nearest_expiry}}</p>
+                {%if stage == "prechoice"%}
+                    {%if item.kitloancartitem.last.loanee_name != None%}
+                        <p class="lead" style="font-size: 5vw;">Loaned to {{item.kitloancartitem.last.loanee_name}}</p>
+                        <p class="lead" style="font-size: 5vw;">Loan Started:<br> {{item.kitloancartitem.last.time}}</p>
+                        <p class="lead" style="font-size: 5vw;">Loan Expiring:<br> {{item.kitloancartitem.last.loan_end_date}}</p>
+                    {%endif%}
+                {%endif%}
+                <p id="errors" class="lead" style="color: rgb(199, 0, 0);margin-top: 5vw;font-size: 5vw;"></p>
+            </div>
+        </div>
+    </div>
+    {%if stage == "prechoice"%}
+        <form action="{%url 'kits_return' item.name%}" method="POST" style="padding: 5vw;">
+            {%csrf_token%}
+            <div>
+                <div class="alert alert-warning d-flex align-items-center" role="alert" style="display: flex;flex-direction: column;align-items: flex-start!important;width: 100%;">
+                    <div>
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                        <strong>Check! Are Any Items Expanded?</strong>
+                    </div>
+                    <hr style="width: 100%;">
+                    <p><strong>You Should Have:</strong></p>
+                    {%for kititem in item.items.all%}
+                    <ul>    
+                        <li class="mb-0">{{kititem.quantity_max}}x {{kititem.item.name}}</li>
+                    </ul>
+                    {%endfor%}
+                </div>
+            </div>
+        </form>
+        <div style="display: flex;flex-direction: column;align-items:center;padding: 5vw;">
+            {%if not item.forced%}
+            <button type="button" class="btn btn-success" onclick="noexpanded()" style="margin-bottom: 5vw;font-size: 4vw;margin-top: -4vw;">No Items Expanded! Return Now!</button>
+            {%endif%}
+            <button type="button" class="btn btn-danger" onclick="expanded()" style="margin-bottom: 5vw;font-size: 4vw;">Some Items Expanded!</button>
+        </div>
+    {%elif stage == "expanded"%}
+    <h1 style="margin-top: 5vw;text-align: center;" class="display-5">Indicate Expanded Items</h1>
+    <div style="display: flex;flex-direction: row; align-items: center;padding: 3vw;">
+        <div class="kititemcontainermobile">
+            <div>
+                {%if targetkititem.item.image is None%}
+                    <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                {%else%}
+                    <img src="/static/inventoryresource/{{targetkititem.item.image}}" style="width: 100%;">
+                {%endif%}
+            </div>
+            <div class="form-floating" style="width: 100%;padding-right:3vw;border-right: white 1px solid;">
+                {%csrf_token%}
+                <select class="form-select" id="selectkititem" aria-label="Floating label select example" required onchange="changeselector()" style="font-size: 3vw;height: 100%;background-image: none;">
+                {%if targetkititem != None%}
+                    {%for kititemexpiry in item.itemsexpiry.all|filternsort%}
+                        {%if kititemexpiry.id == targetkititem.id%}
+                            <option value="{{kititemexpiry.id}}" selected>{{kititemexpiry.expirydate.item.name}} | Expiry: {{kititemexpiry.expirydate.expirydate}}</option>
+                        {%else%}
+                            <option value="{{kititemexpiry.id}}">{{kititemexpiry.expirydate.item.name}} | Expiry: {{kititemexpiry.expirydate.expirydate}}</option>
+                        {%endif%}
+                    {%endfor%}
+                {%else%}
+                    <option selected>Open me</option>
+                        {%for kititemexpiry in item.itemsexpiry.all|filternsort%}
+                            <option value="{{kititemexpiry.id}}">{{kititemexpiry.expirydate.item.name}} | Expiry: {{kititemexpiry.expirydate.expirydate}} </option>
+                        {%endfor%}
+                {%endif%}
+                </select>
+                <label for="selectkititem" style="color: black;font-size: 4vw;">Select Items</label>
+                <p class="lead" style="font-size: 3vw;position:absolute;margin: 0px;" id="data"></p>
+            </div>
+            <div style="text-align: center;">
+                <p class="lead" style="font-size: 3vw;">Qty Expanded</p>
+                <div style="text-align: center;align-items: center;justify-content: center;display: flex;flex-direction: row;">
+                    {%if targetkititem != None%}
+                        {%if max_qty == 0%}
+                        <input type="number" style="width: 5vw; height: 5vw; border: none; border-radius: 2vw; text-align: center;font-size: 3vw;text-align: center;text-indent: 25%;" disabled min=1 value="0" max="{{max_qty}}" id="qtyexpanded">
+                        <p class="lead" style="font-size: 3vw;margin-left: 7px;margin-bottom: 0px;">/ {{max_qty}}</p>
+                        {%else%}
+                        <select type="number" style="width: 5vw; height: 5vw; border: none; border-radius: 2vw; text-align: center;font-size: 3vw;appearance: none;-webkit-appearance:none;text-align: center;text-indent: 25%;background: none;background-color: white;" required min=1 value="1" max="{{max_qty}}" id="qtyexpanded">
+                            {%for value in max_qty|range%}
+                            {%if value != 0%}
+                            <option value="{{value}}">{{value}}</option>
+                            {%endif%}
+                            {%endfor%}
+                        </select>
+                        <p class="lead" style="font-size: 3vw;margin-left: 7px;margin-bottom: 0px;">/ {{max_qty}}</p>
+                        {%endif%}
+                    {%else%}
+                        <input type="number" style="width: 5vw; height: 5vw; border: none; border-radius: 2vw; text-align: center;font-size: 3vw;text-align: center;text-indent: 15%;" required min=0 value="0" disabled>
+                        <p class="lead" style="font-size: 3vw;margin-left: 7px;margin-bottom: 0px;">/ 0</p>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+        <div style="margin-left: 20px;">
+            <a onclick="addtotempcart()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16" id="addbutton">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+    <div style="padding: 3vw;">
+        {%for item_in_tempcart in items_in_tempcart%}
+        <div style="display: flex;flex-direction: row; align-items: center;margin-top: 2vw;">
+            {%if item_in_tempcart.compulsory%}
+            <div class="kititemcontainermobile" style="background-color: #75151e!important;position: relative;padding-top: 11vw;">
+            {%else%}
+            <div class="kititemcontainermobile" style="background-color: #75151e!important;position: relative;">
+            {%endif%}
+                {%if item_in_tempcart.compulsory%}
+                <div style="background-color: white;border-radius: 50px;position: absolute;left: 50%;transform: translateX(-50%);top:10px;padding: 1px 15px;width: fit-content;">
+                    <p style="color: black;font-size: 3vw;margin: 0px;">Expanded From Previous Loan</p>
+                </div>
+                {%endif%}
+                <div>
+                    {%if item_in_tempcart.item.image is None%}
+                        <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                    {%else%}
+                        <img src="/static/inventoryresource/{{kititem.kit.image}}" style="width: 100%;">
+                    {%endif%}
+                </div>
+                <div style="padding-right: 4%;width: 100%;border-right: white 1px solid;">
+                    <p style="font-size: 4vw;font-weight: bold;">{{item_in_tempcart.item.item.name}}</p>
+                    <p class="lead" style="font-size: 3vw;">Expanded Qty: <p class="lead" style="font-size: 3vw;">{{item_in_tempcart.expanded_qty}}x {{item_in_tempcart.item.item.name}} expiring on {{item_in_tempcart.item_in_kit.expirydate.expirydate}}</p></p>
+                </div>
+                <div style="margin-left: 4%;margin-right: 4%;width:100%;text-align: center;">
+                    <p class="lead" style="font-size: 3vw;">You Should Have <strong>{{item_in_tempcart|findremainder}}</strong> {{item_in_tempcart.item.item.name}} Left In Your Kit</p>
+                </div>
+            </div>
+            {%if not item_in_tempcart.compulsory%}
+            <div style="margin-left: 5vw;">
+                <a onclick="removetempcart('{{item_in_tempcart.id}}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16" id="removefromtempcartbutton" style="color: #dc3545;">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                    </svg>
+                </a>
+            </div>
+            {%endif%}
+        </div>
+        {%endfor%}
+    </div>
+    {%if items_in_tempcart%}
+        <div style="display: flex;flex-direction: column;margin-top: 6vw;align-items: center;justify-content: center;">
+            {%if items_in_tempcart|check%}
+            <button type="button" class="btn btn-warning" style="margin-bottom: 5vw;font-size: 3vw;" onclick="autostock()">Return Kit and Auto-Stock</button>
+            {%endif%}
+            <button type="button" class="btn btn-danger" style="margin-bottom: 5vw;font-size: 3vw;" onclick="stocklater()">Return Kit and Stock Later</button>
+        </div>
+    {%endif%}
+    {%endif%}
+</div>
+<script>
+    jQuery(document).ready(function($) {
+        $('.search-button').parent().toggleClass('open');
+        let check = false;
+        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+        if (check){
+            document.getElementById('topnavbar').style.display = "none";
+            document.getElementById('mobilenavbar').style.display = "block";
+            document.getElementById('content').style.display="none";
+            document.getElementById('content').innerHTML = "";
+            document.getElementById('mobilecontent').style.display="block";
+            if ('{{stage}}' == "expanded"){
+                var sel = document.getElementById('selectkititem');
+                var opt = sel.options[sel.selectedIndex];
+                if (opt.value != "Open me"){
+                    var data = opt.innerHTML;
+                    var newdata = "";
+                    for (var i=0; i< data.length; i++){
+                        newdata += data[i]
+                        if (data[i]== "|"){
+                            newdata ="";
+                        }
+                    }
+                    document.getElementById('data').innerHTML=newdata;
+                }
+            }
+        }
+    });
+    function showmenu(){
+        document.getElementById('menu').style.animationName = "moverightmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(0px)";
+        document.getElementById('overlay').style.display="block";
+        document.querySelector('body').style.overflow= "hidden";
+    }
+    function closemenu(){
+        document.getElementById('menu').style.animationName = "movebackmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(100vw)";
+        document.getElementById('overlay').style.display="none";
+        document.querySelector('body').style.overflow= "auto";
+    }
+    function noexpanded(){
+        document.getElementById('generalloader').style.display="block";
+        document.getElementById('loaderoverlay').style.display="block";
+        $.ajax({
+            beforeSend: function (request) {
+                if (!confirm('Are you sure NO ITEMS are expanded?')){
+                    loadingclose()
+                    return false
+                }
+            },
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "noexpanded",
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data){
+                document.getElementById('generalloader').style.display="none";
+                document.getElementById('loaderoverlay').style.display="none";
+                window.location = "{%url 'kits_list'%}"
+            }
+        });
+    }
+    function expanded(){
+        $.ajax({
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "expanded",
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                $("body").html(data);
+            }
+        });
+    }
+    function changeselector(){
+        $.ajax({
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "getkititem_max",
+                "kititemexpiry": document.getElementById('selectkititem').value,
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                $("body").html(data);
+            }
+        });
+    }
+    function addtotempcart(){
+        $.ajax({
+            beforeSend: function (request) {
+                if (Number(document.getElementById('qtyexpanded').value) > Number(document.getElementById('qtyexpanded').max) ){
+                    alert("Input qty more than qty available!")
+                    return false
+                } else if (Number(document.getElementById('qtyexpanded').value) == 0){
+                    alert("Input qty is 0!")
+                    return false
+                }
+            },
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "addtotempcart",
+                "targetkititemexpiry": '{{targetkititem.id}}',
+                "qtyexpanded": document.getElementById('qtyexpanded').value,
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                $("body").html(data);
+            }
+        });
+    }
+    function removetempcart(target){
+        $.ajax({
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "removefromtempcart",
+                "targetcart": target,
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                $("body").html(data);
+            }
+        });
+    }
+    function autostock(){
+        document.getElementById('generalloader').style.display="block";
+        document.getElementById('loaderoverlay').style.display="block";
+        $.ajax({
+            beforeSend: function (request) {
+                if (!confirm('IMPORTANT!\nAuto Stock will only stock from unopened.\nAutostock only stocks from same expiry.\nAutostock only when you want to stock ALL to full capacity.\n\nItems to be Stocked:\n{%for item in items_in_tempcart%}{{item.expanded_qty}}x Unopened {{item.item.item.name}}, Expiry: {{item.item.expirydate}}\n{%endfor%}')){
+                    return false
+                }
+            },
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "autostock",
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                document.getElementById('generalloader').style.display="none";
+                document.getElementById('loaderoverlay').style.display="none";
+                window.location = "{%url 'kits_list'%}"
+            }
+        });
+    }
+    function stocklater(){
+        document.getElementById('generalloader').style.display="block";
+        document.getElementById('loaderoverlay').style.display="block";
+        $.ajax({
+            beforeSend: function (request) {
+                if (!confirm('IMPORTANT!\nEnsure You Have Entered ALL Expanded Items!\n\nItems Expanded:\n{%for item in items_in_tempcart%}{{item.expanded_qty}}x {{item.item.item.name}}, Expiry: {{item.item.expirydate}}\n{%endfor%}')){
+                    return false
+                }
+            },
+            type: "POST",
+            url: "{%url 'kits_return' item.name%}",
+            data: {
+                "action": "stocklater",
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                document.getElementById('generalloader').style.display="none";
+                document.getElementById('loaderoverlay').style.display="none";
+                window.location = "{%url 'kits_list'%}"
+            }
+        });
+    }
+</script>
+
+{% endblock %}

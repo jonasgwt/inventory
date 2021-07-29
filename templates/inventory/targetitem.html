@@ -1,0 +1,49 @@
+{% extends "inventory/template.html" %}
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock head_meta %}
+
+{% block body %}
+<style>
+    .bg {
+    /* The image used */
+    background-image: url("/static/inventoryresource/A6.jpg");
+
+    /* Full height */
+    height: 100%; 
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    flex-wrap: wrap;
+    }
+</style>
+
+<div class="bg">
+    {%if target.image is None%}
+        <img src="/static/inventoryresource/logo.png" style="width: 250px; height: 250px; margin-bottom: 20px; animation: fadeinmovedown 1s forwards;object-fit: cover;">
+    {%else%}
+        <img src="/uploaded/inventoryitemimages/{{target.image}}" style="width: 250px;height: 250px; object-fit: cover;margin-bottom: 20px; animation: fadeinmovedown 1s forwards;">
+    {%endif%}    
+    <h1 class="display-3" style="color: black;animation: fadeinmovedown 1s forwards;">{{target.name}}</h1>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Total Quantity: {{target.total_quantityopen|add:target.total_quantityunopened}}</p>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Type: {{target.unit}}</p>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Expiry Date: {%for expiry in target.expirydates.all%}<p class="lead" style="font-size: 20px;color: black;animation: fadeinmovedown 1s forwards;">{{expiry.expirydate}}</p>{%endfor%}</p>
+    <p class="lead" style="color: black; font-size: 35px; animation: fadeinmovedown 1s forwards;">Select one option</p>
+    <a href="{% url 'itemwithdraw' target.id%}">
+        <button type="button" class="btn btn-outline-danger" style="margin-bottom: 20px; width: 220px; height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Withdraw</button>
+    </a>
+    <a href="{% url 'itemdeposit' target.id%}">
+        <button type="button" class="btn btn-outline-success"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Deposit</button>
+    </a>
+</div>
+
+
+
+
+{% endblock %}

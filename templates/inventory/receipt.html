@@ -1,0 +1,501 @@
+{% extends "inventory/template.html" %}
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1">
+{% endblock head_meta %}
+{% block body %}
+<style>
+    .cartheadercontainer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .borderwithdraw{
+        border:  1px solid #d3d3d3!important;
+        padding: 80px;
+        border-radius: 50px;
+        background-color: #75151e!important;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        width: 950px;
+        margin-top: 100px;
+    }
+    .borderwithdrawmobile{
+        border:  1px solid #d3d3d3!important;
+        padding: 7vw;
+        border-radius: 5vw;
+        background-color: #75151e!important;
+        width: 100%;
+        margin-top: 20vw;
+    }
+    .borderdeposit{
+        border:  1px solid #d3d3d3!important;
+        padding: 80px;
+        border-radius: 50px;
+        background-color: #198754!important;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        width: 950px;
+        margin-top: 100px;
+    }
+    .borderdepositmobile{
+        border:  1px solid #d3d3d3!important;
+        padding: 7vw;
+        border-radius: 5vw;
+        background-color: #198754!important;
+        width: 100%;
+        margin-top: 100px;
+    }
+    .borderneutral{
+        border:  1px solid #d3d3d3!important;
+        padding: 80px;
+        border-radius: 50px;
+        background-color: #000000!important;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        width: 950px;
+        margin-top: 100px;
+    }
+    .borderneutralmobile{
+        border:  1px solid #d3d3d3!important;
+        padding: 7vw;
+        border-radius: 5vw;
+        background-color: #000000!important;
+        width: 100%;
+        margin-top: 20vw;
+    }
+    .cartheadercontainermobile{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+<nav class="navbar navbar-dark bg-dark" style="position: fixed;top: 0;width: 100%;flex-wrap: nowrap;" id="pcnavbar">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand" href="{%url 'item_list'%}" style="display: flex;">
+            <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+            <p class="lead" style="margin: auto; font-size: 20px;">Inventory Management System</p>
+        </a>
+        <div style="display: flex;">
+        <!-- Logged in user -->
+            <span class="navbar-text" style="margin-right: 20px;text-overflow: clip;white-space: nowrap;">
+                Logged in as {{user.username}}
+            </span>
+            <!-- Cart -->
+            <a href="{%url 'activecart'%}" style="display: flex;align-items: center;margin-right: 20px;position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="color:rgb(255 255 255 / 55%);">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                {%if numitemsincart != 0%}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="margin-top:10px;">
+                    {{numitemsincart}}
+                </span>
+                {%endif%}
+            </a>
+            <!-- Log out -->
+            <a href="{%url 'logout_view'%}" style="display: flex;align-items: center;">
+                <button type="button" class="btn btn-outline-secondary" style="color: rgb(255 255 255 / 55%);border-radius: 25px; margin-right: 5px;height: 30px;display: flex;align-items: center;">Logout</button>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Nav Bar -->
+<!-- Top Menu bar -->
+<nav class="navbar navbar-dark bg-dark" style="position:fixed;top: 0;width: 100%;flex-wrap: nowrap;z-index: 10;display: none;" id="mobilenavbar">
+    <div class="container-fluid">
+        <div id="smallscreenlogo">
+            <a class="navbar-brand" href="{%url 'item_list'%}" style="display: flex;">
+                <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                <p class="lead" style="margin: auto; font-size: 20px;">IMS</p>
+            </a>
+        </div>
+        <div style="display: flex;">
+            <!-- Menu Icon -->
+            <div onclick="showmenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="align-self: center;">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- Menu -->
+<div style="background-color: rgba(0, 0, 0, 0.473);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;display: none;" onclick="closemenu()" id="overlay"></div>
+<div id="menu" style="position: fixed;overflow: auto; height: 100%; right: 0;top: 0;z-index: 100;padding: 5vw 15vw;-webkit-backdrop-filter: blur(6vw);backdrop-filter: blur(6vw);background-color: #2125299d;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);transform: translateX(100vw);">
+    <div id="topsearchnavibar" style="display: flex;flex-direction: column;">
+        <a href="{%url 'item_list'%}">
+            <button type="button" class="btn btn-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Back to Items List</button>
+        </a>
+        <a href="{%url 'activecart'%}">
+            <button type="button" class="btn btn-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;position: relative;">View Cart
+                {%if numitemsincart != 0%}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{numitemsincart}}
+                </span>
+                {%endif%}
+            </button>
+        </a>
+        <a href="{%url 'orderlogs'%}">
+        <button type="button" class="btn btn-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">View Logs</button>
+        </a>
+        <a href="{%url 'logout_view_sjb'%}">
+            <button type="button" class="btn btn-danger" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Logout</button>
+        </a>
+        <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+    </div>
+</div>
+
+<div class="cartheadercontainer" id="pccontent">
+    {%if type == "order"%}
+        {%if targetorder.ordertype == "Withdraw"%}
+        <div class="borderwithdraw">
+        {%else%}
+        <div class="borderdeposit">
+        {%endif%}
+    {%else%}
+        <div class="borderneutral">
+    {%endif%}
+        {%if type == "loan"%}
+        <h1 class="display-5" style="text-align: left;">Loan No. {{targetorder.id}}</h1>
+        {%else%}
+        <h1 class="display-5" style="text-align: left;">Order No. {{targetorder.id}}</h1>
+        {%endif%}
+        <div style="margin-top: 20px;">
+            {%if type == "loan"%}
+                {%if targetorder.loan_active%}
+                    <p class="lead" style="text-align: left;font-size: 25px;">Loan Status: <strong style="color: #198754;">Active</strong></p>
+                
+                {%else%}
+                    <p class="lead" style="text-align: left;font-size: 25px;">Loan Status: <strong style="color: #75151e;">Closed</strong></p>
+                {%endif%}
+                {%if targetorder.loancart.last.loan%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Order Type: Loan</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Loan to {{targetorder.loanee_name}} until {{targetorder.loan_end_date}}</p>
+                {%else%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Order Type: Loan</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Return of loan to {{targetorder.loanee_name}} with due date, {{targetorder.loan_end_date}}</p>
+                {%endif%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Time of Order Submission: {{targetorder.loancart.last.time}}</p>
+            {%else%}    
+                {%if targetorder.ordertype == "Withdraw"%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Order Type: Withdraw</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Ordering Account: {{targetorder.ordering_account}}</p>
+                {%if targetorder.for_kit == None%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Reason for Withdrawal: {{targetorder.reason}}</p>
+                {%else%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Reason for Withdrawal: {{targetorder.reason}} for Kit {{targetorder.for_kit.name}}</p>
+                {%endif%}
+                {%elif targetorder.ordertype == "Deposit"%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Order Type: Deposit</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 25px;">Reason for Deposit: {{targetorder.reason}}</p>
+                {%endif%}
+                <p class="lead" style="text-align: left;font-size: 25px;">Time of Order Submission: {{targetorder.time}}</p>
+            {%endif%}
+        </div>
+        <div style="margin-top: 50px;">
+            {%if type == "order"%}
+                {%for cartitem in targetorder.cart.all%}
+                <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-around;margin-top: 20px;">
+                    {%if cartitem.item.image%}
+                    <img src="/uploaded/inventoryitemimages/{{cartitem.item.image}}" style="width: 200px; height: 200px;object-fit: cover;">
+                    {%else%}
+                    <img src="/static/inventoryresource/logo.png" style="width: 200px; height: 200px;object-fit: cover;">
+                    {%endif%}
+                    <div style="display: flex;flex-direction: column;">
+                        <p class="lead">Item Name: {{cartitem.item.item.name}}</p>
+                        <p class="lead">Item Expiry: {{cartitem.item.expirydate}}</p>
+                        {%if cartitem.quantityopen > 0 and cartitem.withdraw%}
+                        <p class="lead">Quantity Withdraw from Opened: {{cartitem.quantityopen}}</p>
+                        {%elif cartitem.quantityopen > 0 and not cartitem.withdraw%}
+                        <p class="lead">Quantity Deposit from Opened: {{cartitem.quantityopen}}</p>
+                        {%endif%}
+                        {%if cartitem.quantityunopened > 0 and cartitem.withdraw%}
+                        <p class="lead">Quantity Withdraw from Unopened: {{cartitem.quantityunopened}}</p>
+                        {%elif cartitem.quantityunopened > 0 and not cartitem.withdraw%}
+                        <p class="lead">Quantity Deposit from Unopened: {{cartitem.quantityunopened}}</p>
+                        {%endif%}
+                        <p class="lead">Time Item was added to Cart: {{cartitem.time}}</p>
+                    </div>
+                </div>
+                {%endfor%}
+            {%else%}
+                {%for loanitem in targetorder.loancart.all reversed%}
+                    {%if loanitem.loan or loanitem.expanded%}  
+                        <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-around;margin-top: 20px;background-color: #75151e;padding: 20px;border-radius: 30px;border: 1px solid white;">
+                            {%if loanitem.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{loanitem.item.image}}" style="width: 200px; height: 200px;object-fit: cover;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 200px; height: 200px;object-fit: cover;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;width:450px;">
+                                <p class="lead">Item Name: {{loanitem.item.item.name}}</p>
+                                <p class="lead">Item Expiry: {{loanitem.item.expirydate}}</p>
+                                {%if loanitem.expanded%}
+                                    {%if loanitem.quantityopen > 0%}
+                                    <p class="lead">Quantity Expanded from Opened: {{loanitem.quantityopen}}</p>
+                                    {%endif%}
+                                    {%if loanitem.quantityunopened > 0%}
+                                    <p class="lead">Quantity Expanded from Unopened: {{loanitem.quantityunopened}}</p>
+                                    {%endif%}
+                                    <p class="lead">Item reported expanded on {{loanitem.time}}</p>
+                                {%else%}
+                                    {%if loanitem.quantityopen > 0%}
+                                    <p class="lead">Quantity Loaned from Opened: {{loanitem.quantityopen}}</p>
+                                    {%endif%}
+                                    {%if loanitem.quantityunopened > 0%}
+                                    <p class="lead">Quantity Loaned from Unopened: {{loanitem.quantityunopened}}</p>
+                                    {%endif%}
+                                    <p class="lead">Item was Loaned out on {{loanitem.time}}</p>
+                                {%endif%}
+                            </div> 
+                        </div>
+                    {%else%}
+                        <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-around;margin-top: 20px;background-color: #198754;padding: 20px;border-radius: 30px;border: 1px solid white;">
+                            {%if loanitem.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{loanitem.item.image}}" style="width: 200px; height: 200px;object-fit: cover;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 200px; height: 200px;object-fit: cover;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;width:450px;">
+                                <p class="lead">Item Name: {{loanitem.item.item.name}}</p>
+                                <p class="lead">Item Expiry: {{loanitem.item.expirydate}}</p>
+                                {%if loanitem.quantityopen > 0%}
+                                <p class="lead">Quantity Returned from Opened: {{loanitem.quantityopen}}</p>
+                                {%endif%}
+                                {%if loanitem.quantityunopened > 0%}
+                                <p class="lead">Quantity Returned from Unopened: {{loanitem.quantityunopened}}</p>
+                                {%endif%}
+                                <p class="lead">Item was returned on {{loanitem.time}}</p>
+                            </div> 
+                        </div>
+                    {%endif%}
+                {%endfor%}
+            {%endif%}
+        </div>
+    </div>
+    {%if targetorder.loan_active%}
+        <div class="borderneutral" style="margin-bottom: 50px;">
+            <h1 class="display-5" style="text-align: left;">Outstanding Items in Loan {{targetorder.id}}</h1>
+            <div style="margin-top: 20px;">
+                <p class="lead" style="text-align: left;font-size: 25px;">Loan Expiry: {{targetorder.loan_end_date}}</p>
+            </div>    
+            {%for outstandingloan in targetorder.outstandingloan.all reversed%}
+            <div style="display: flex;margin-top:50px;flex-direction: row;align-items: center;justify-content: space-around;margin-top: 20px;background-color: #75151e;padding: 20px;border-radius: 30px;border: 1px solid white;">
+                {%if outstandingloan.item.image%}
+                <img src="/uploaded/inventoryitemimages/{{outstandingloan.item.image}}" style="width: 200px; height: 200px;object-fit: cover;">
+                {%else%}
+                <img src="/static/inventoryresource/logo.png" style="width: 200px; height: 200px;object-fit: cover;">
+                {%endif%}
+                <div style="display: flex;flex-direction: column; width: 450px;">
+                    <p class="lead">Item Name: {{outstandingloan.item.item.name}}</p>
+                    <p class="lead">Item Expiry: {{outstandingloan.item.expirydate}}</p>
+                    {%if outstandingloan.quantityopen > 0%}
+                    <p class="lead">Outstanding Opened Quantity: {{outstandingloan.quantityopen}}</p>
+                    {%endif%}
+                    {%if outstandingloan.quantityunopened > 0%}
+                    <p class="lead">Outstanding Unopened Quantity: {{outstandingloan.quantityunopened}}</p>
+                    {%endif%}
+                </div> 
+            </div>
+            {%endfor%}
+        </div>
+    {%endif%}
+</div>
+
+<!-- Mobile -->
+<div class="cartheadercontainermobile" id="mobilecontent" style="display: none;">
+    {%if type == "order"%}
+        {%if targetorder.ordertype == "Withdraw"%}
+        <div class="borderwithdrawmobile">
+        {%else%}
+        <div class="borderdepositmobile">
+        {%endif%}
+    {%else%}
+        <div class="borderneutralmobile">
+    {%endif%}
+        {%if type == "loan"%}
+        <h1 class="display-5" style="text-align: left;font-size: 6vw;">Loan No. {{targetorder.id}}</h1>
+        {%else%}
+        <h1 class="display-5" style="text-align: left;font-size: 6vw;">Order No. {{targetorder.id}}</h1>
+        {%endif%}
+        <div style="margin-top: 20px;">
+            {%if type == "loan"%}
+                {%if targetorder.loan_active%}
+                    <p class="lead" style="text-align: left;font-size: 4vw;">Loan Status: <strong style="color: #198754;">Active</strong></p>
+                
+                {%else%}
+                    <p class="lead" style="text-align: left;font-size: 4vw;">Loan Status: <strong style="color: #75151e;">Closed</strong></p>
+                {%endif%}
+                {%if targetorder.loancart.last.loan%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Order Type: Loan</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Loan to {{targetorder.loanee_name}} until {{targetorder.loan_end_date}}</p>
+                {%else%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Order Type: Loan</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Return of Loan to {{targetorder.loanee_name}} with due date, {{targetorder.loan_end_date}}</p>
+                {%endif%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Time of Order Submission: {{targetorder.loancart.last.time}}</p>
+            {%else%}    
+                {%if targetorder.ordertype == "Withdraw"%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Order Type: Withdraw</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Ordering Account: {{targetorder.ordering_account}}</p>
+                {%if targetorder.for_kit == None%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Reason for Withdrawal: {{targetorder.reason}}</p>
+                {%else%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Reason for Withdrawal: {{targetorder.reason}} for Kit {{targetorder.for_kit.name}}</p>
+                {%endif%}
+                {%elif targetorder.ordertype == "Deposit"%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Order Type: Deposit</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Ordering Account: {{targetorder.ordering_account}}</p>
+                <p class="lead" style="text-align: left;font-size: 4vw;">Reason for Deposit: {{targetorder.reason}}</p>
+                {%endif%}
+                <p class="lead" style="text-align: left;font-size: 4vw;">Time of Order Submission: {{targetorder.time}}</p>
+            {%endif%}
+        </div>
+        <div style="margin-top: 50px;">
+            {%if type == "order"%}
+                {%for cartitem in targetorder.cart.all%}
+                <div style="display: grid;grid-template-columns: auto auto;margin-top: 5vw;align-items: center;grid-gap: 5vw;">
+                    {%if cartitem.item.image%}
+                    <img src="/uploaded/inventoryitemimages/{{cartitem.item.image}}" style="width: 100%;">
+                    {%else%}
+                    <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                    {%endif%}
+                    <div style="display: flex;flex-direction: column;">
+                        <p class="lead" style="font-size: 4vw;">Item Name: {{cartitem.item.item.name}}</p>
+                        <p class="lead" style="font-size: 4vw;">Item Expiry: {{cartitem.item.expirydate}}</p>
+                        {%if cartitem.quantityopen > 0 and cartitem.withdraw%}
+                        <p class="lead" style="font-size: 4vw;">Qty Withdraw (Opened): {{cartitem.quantityopen}}</p>
+                        {%elif cartitem.quantityopen > 0 and not cartitem.withdraw%}
+                        <p class="lead" style="font-size: 4vw;">Qty Deposit (Opened): {{cartitem.quantityopen}}</p>
+                        {%endif%}
+                        {%if cartitem.quantityunopened > 0 and cartitem.withdraw%}
+                        <p class="lead" style="font-size: 4vw;">Qty Withdraw (Unopened): {{cartitem.quantityunopened}}</p>
+                        {%elif cartitem.quantityunopened > 0 and not cartitem.withdraw%}
+                        <p class="lead" style="font-size: 4vw;">Qty Deposit from (Unopened): {{cartitem.quantityunopened}}</p>
+                        {%endif%}
+                        <p class="lead" style="font-size: 4vw;">Time Item was added to Cart: {{cartitem.time}}</p>
+                    </div>
+                </div>
+                {%endfor%}
+            {%else%}
+                {%for loanitem in targetorder.loancart.all reversed%}
+                    {%if loanitem.loan or loanitem.expanded%}  
+                        <div style="display: grid;grid-template-columns: auto auto;margin-top: 5vw;align-items: center;background-color: #75151e;padding: 20px;border-radius: 5vw;border: 1px solid white;grid-gap: 5vw;">
+                            {%if loanitem.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{loanitem.item.image}}" style="width: 100%;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;">
+                                <p class="lead" style="font-size: 4vw;">Item Name: {{loanitem.item.item.name}}</p>
+                                <p class="lead" style="font-size: 4vw;">Item Expiry: {{loanitem.item.expirydate}}</p>
+                                {%if loanitem.expanded%}
+                                    {%if loanitem.quantityopen > 0%}
+                                    <p class="lead" style="font-size: 4vw;">Qty Expanded (Opened): {{loanitem.quantityopen}}</p>
+                                    {%endif%}
+                                    {%if loanitem.quantityunopened > 0%}
+                                    <p class="lead" style="font-size: 4vw;">Qty Expanded (Unopened): {{loanitem.quantityunopened}}</p>
+                                    {%endif%}
+                                    <p class="lead" style="font-size: 4vw;">Item reported expanded on {{loanitem.time}}</p>
+                                {%else%}
+                                    {%if loanitem.quantityopen > 0%}
+                                    <p class="lead" style="font-size: 4vw;">Qty Loaned (Opened): {{loanitem.quantityopen}}</p>
+                                    {%endif%}
+                                    {%if loanitem.quantityunopened > 0%}
+                                    <p class="lead" style="font-size: 4vw;">Qty Loaned (Unopened): {{loanitem.quantityunopened}}</p>
+                                    {%endif%}
+                                    <p class="lead" style="font-size: 4vw;">Item was Loaned out on {{loanitem.time}}</p>
+                                {%endif%}
+                            </div> 
+                        </div>
+                    {%else%}
+                        <div style="display: grid;grid-template-columns: auto auto;margin-top: 5vw;align-items: center;background-color: #198754;padding: 20px;border-radius: 5vw;border: 1px solid white;grid-gap: 5vw;">
+                            {%if loanitem.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{loanitem.item.image}}" style="width: 100%;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;">
+                                <p class="lead" style="font-size: 4vw;">Item Name: {{loanitem.item.item.name}}</p>
+                                <p class="lead" style="font-size: 4vw;">Item Expiry: {{loanitem.item.expirydate}}</p>
+                                {%if loanitem.quantityopen > 0%}
+                                <p class="lead" style="font-size: 4vw;">Qty Returned (Opened): {{loanitem.quantityopen}}</p>
+                                {%endif%}
+                                {%if loanitem.quantityunopened > 0%}
+                                <p class="lead" style="font-size: 4vw;">Qty Returned (Unopened): {{loanitem.quantityunopened}}</p>
+                                {%endif%}
+                                <p class="lead" style="font-size: 4vw;">Item was returned on {{loanitem.time}}</p>
+                            </div> 
+                        </div>
+                    {%endif%}
+                {%endfor%}
+            {%endif%}
+        </div>
+    </div>
+    {%if targetorder.loan_active%}
+        <div class="borderneutralmobile" style="margin-top: 5vw;margin-bottom: 5vw;">
+            <h1 class="display-5" style="text-align: left;font-size: 6vw;">Outstanding Items in Loan {{targetorder.id}}</h1>
+            <div style="margin-top: 5vw;">
+                <p class="lead" style="text-align: left;font-size: 5vw;">Loan Expiry: {{targetorder.loan_end_date}}</p>
+            </div>    
+            {%for outstandingloan in targetorder.outstandingloan.all reversed%}
+            <div style="display: grid;grid-template-columns: auto auto;margin-top: 5vw;align-items: center;background-color: #75151e;padding: 20px;border-radius: 30px;border: 1px solid white;grid-gap: 5vw;">
+                {%if outstandingloan.item.image%}
+                <img src="/uploaded/inventoryitemimages/{{outstandingloan.item.image}}" style="width: 100%;">
+                {%else%}
+                <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                {%endif%}
+                <div style="display: flex;flex-direction: column;">
+                    <p class="lead" style="font-size: 4vw;">Item Name: {{outstandingloan.item.item.name}}</p>
+                    <p class="lead" style="font-size: 4vw;">Item Expiry: {{outstandingloan.item.expirydate}}</p>
+                    {%if outstandingloan.quantityopen > 0%}
+                    <p class="lead" style="font-size: 4vw;">Outstanding Opened Quantity: {{outstandingloan.quantityopen}}</p>
+                    {%endif%}
+                    {%if outstandingloan.quantityunopened > 0%}
+                    <p class="lead" style="font-size: 4vw;">Outstanding Unopened Quantity: {{outstandingloan.quantityunopened}}</p>
+                    {%endif%}
+                </div> 
+            </div>
+            {%endfor%}
+        </div>
+    {%endif%}
+</div>
+<script>
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.location = $(this).data("href");
+        });
+        let check = false;
+        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+        if (check){
+            document.getElementById('pcnavbar').style.display="none";
+            document.getElementById('mobilenavbar').style.display="block";
+            document.getElementById('mobilecontent').style.display="block";
+            document.getElementById('pccontent').style.display="none";
+        }
+    });
+    function showmenu(){
+        document.getElementById('menu').style.animationName = "moverightmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(0px)";
+        document.getElementById('overlay').style.display="block";
+        document.querySelector('body').style.overflow= "hidden";
+    }
+    function closemenu(){
+        document.getElementById('menu').style.animationName = "movebackmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(100vw)";
+        document.getElementById('overlay').style.display="none";
+        document.querySelector('body').style.overflow= "auto";
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,1468 @@
+{% extends "inventory/template.html" %}
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock head_meta %}
+{% block body %}
+<style>
+    .itemcontainer{
+        display: flex;
+        border-radius: 25px;
+        border: 2px solid #d3d3d3;
+        padding: 20px;
+        margin: auto;
+        margin-top: 50px;
+        width: 950px;
+        align-items: center;
+    }
+    .lead{
+        margin: 1px;
+        font-size: 15px;
+    }
+    .rightsettings{
+        position: absolute;
+        right: 0px;
+        margin-right: 50px;
+        border: 2px solid #d3d3d3;
+        border-radius: 25px;
+        padding: 30px;
+    }
+    @media screen and (max-width: 1650px) {
+        .rightsettings{
+            display: none;
+        }
+    }
+    .searchsettingscheckbox{
+        margin-bottom: 10%;
+        display: flex;
+        flex-direction: column;
+    }
+    .btn-close:focus{
+        outline: none;
+        box-shadow: none;
+    }
+    @media screen and (min-width: 1650px) {
+        #mobilesearch{
+            display: none;
+        }
+        #topsearchnavibardiv{
+            display: none;
+        }
+    }
+    .searchsettingsinput{
+        margin-bottom: 10%;
+    }
+    .buttonselected {
+        color: #fff;
+        background-color: #198754;
+        border-color: #198754;
+    }
+    .buttonselectedgrey{
+        color: #fff;
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+    .pagination > li > a
+    {
+        background-color: #121212;
+        color: white;
+    }
+
+    .pagination > li > a:focus,
+    .pagination > li > a:hover,
+    .pagination > li > span:focus,
+    .pagination > li > span:hover
+    {
+        color: #5a5a5a;
+        background-color: #121212;
+        border-color: #ddd;
+    }
+    * {
+        box-sizing: border-box;
+    }
+    .search {
+        width: 10vw;
+        height: 10vw;
+        margin: 4vw auto 0;
+        background-color: #242628;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s ease;
+    }
+    .search:before {
+        content: '';
+        display: block;
+        width: 0.3vw;
+        height: 100%;
+        position: relative;
+        background-color: #198754;
+        transition: all 0.5s ease;
+    }
+    .search.open {
+        width: 75vw;
+    }
+    .search.open:before {
+        height: 6vw;
+        margin: 2vw 0 2vw 3vw;
+        position: absolute;
+    }
+    .search-box {
+        width: 100%;
+        height: 100%;
+        box-shadow: none;
+        border: none;
+        background: transparent;
+        color: #fff;
+        padding: 2vw 10vw 2vw 4.5vw;
+        font-size: 4vw;
+    }
+    .search-box:focus {
+        outline: none;
+    }
+    .search-button {
+        width: 10vw;
+        height: 10vw;
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 2vw;
+        cursor: pointer;
+    }
+    .search-icon {
+        width: 4vw;
+        height: 4vw;
+        border-radius: 4vw;
+        border: 0.3vw solid #198754;
+        display: block;
+        position: relative;
+        margin-left: 0.5vw;
+        transition: all 0.5s ease;
+    }
+    .search-icon:before {
+        content: '';
+        width: 0.3vw;
+        height: 1.5vw;
+        position: absolute;
+        right: -0.2vw;
+        top: 3vw;
+        display: block;
+        background-color: #198754;
+        transform: rotate(-45deg);
+        transition: all 0.5s ease;
+    }
+    .search-icon:after {
+        content: '';
+        width: 0.3vw;
+        height: 1.5vw;
+        position: absolute;
+        right: -1.2vw;
+        top: 4vw;
+        display: block;
+        background-color: #198754;
+        transform: rotate(-45deg);
+        transition: all 0.5s ease;
+    }
+    .open .search-icon {
+        margin: 0;
+        width: 6vw;
+        height: 6vw;
+        border-radius: 6vw;
+    }
+    .open .search-icon:before {
+        transform: rotate(52deg);
+        right: 2.2vw;
+        top: 2.3vw;
+        height: 1.8vw;
+    }
+    .open .search-icon:after {
+        transform: rotate(-230deg);
+        right: 2.2vw;
+        top: 1.3vw;
+        height: 1.8vw;
+    }
+    .itemcontainermobile{
+        display: grid;
+        grid-template-columns: auto 40vw 20vw;
+        border-radius: 25px;
+        border: 1px solid #d3d3d3;
+        padding: 5px 10px;
+        margin: auto;
+        margin-top: 20px;
+        width: 90%;
+        align-items: center;
+        grid-column-gap:2vw;
+    }
+    .site-footer
+    {
+    background-color:#212529;
+    padding:45px 0 20px;
+    font-size:15px;
+    line-height:24px;
+    color:#737373;
+    }
+    .site-footer hr
+    {
+    border-top-color:#bbb;
+    opacity:0.5
+    }
+    .site-footer hr.small
+    {
+    margin:20px 0
+    }
+    .site-footer h6
+    {
+    color:#fff;
+    font-size:16px;
+    text-transform:uppercase;
+    margin-top:5px;
+    letter-spacing:2px
+    }
+    .site-footer a
+    {
+    color:#737373;
+    }
+    .site-footer a:hover
+    {
+    color:#3366cc;
+    text-decoration:none;
+    }
+    .footer-links
+    {
+    padding-left:0;
+    list-style:none
+    }
+    .footer-links li
+    {
+    display:block
+    }
+    .footer-links a
+    {
+    color:#737373
+    }
+    .footer-links a:active,.footer-links a:focus,.footer-links a:hover
+    {
+    color:#3366cc;
+    text-decoration:none;
+    }
+    .footer-links.inline li
+    {
+    display:inline-block
+    }
+    .site-footer .social-icons
+    {
+    text-align:right
+    }
+    .site-footer .social-icons a
+    {
+    width:40px;
+    height:40px;
+    line-height:40px;
+    margin-left:6px;
+    margin-right:0;
+    border-radius:100%;
+    background-color:#212529
+    }
+    .copyright-text
+    {
+    margin:0
+    }
+    @media (max-width:991px)
+    {
+    .site-footer [class^=col-]
+    {
+        margin-bottom:30px
+    }
+    }
+    @media (max-width:767px)
+    {
+    .site-footer
+    {
+        padding-bottom:0
+    }
+    .site-footer .copyright-text,.site-footer .social-icons
+    {
+        text-align:center
+    }
+    }
+    .social-icons
+    {
+    padding-left:0;
+    margin-bottom:0;
+    list-style:none
+    }
+    .social-icons li
+    {
+    display:inline-block;
+    margin-bottom:4px
+    }
+    .social-icons li.title
+    {
+    margin-right:15px;
+    text-transform:uppercase;
+    color:#96a2b2;
+    font-weight:700;
+    font-size:13px
+    }
+    .social-icons a{
+    background-color:#eceeef;
+    color:#818a91;
+    font-size:16px;
+    display:inline-block;
+    line-height:44px;
+    width:44px;
+    height:44px;
+    text-align:center;
+    margin-right:8px;
+    border-radius:100%;
+    -webkit-transition:all .2s linear;
+    -o-transition:all .2s linear;
+    transition:all .2s linear
+    }
+    .social-icons a:active,.social-icons a:focus,.social-icons a:hover
+    {
+    color:#fff;
+    background-color:#29aafe
+    }
+    .social-icons.size-sm a
+    {
+    line-height:34px;
+    height:34px;
+    width:34px;
+    font-size:14px
+    }
+    .social-icons a.facebook:hover
+    {
+    background-color:#3b5998
+    }
+    .social-icons a.twitter:hover
+    {
+    background-color:#00aced
+    }
+    .social-icons a.linkedin:hover
+    {
+    background-color:#007bb6
+    }
+    .social-icons a.dribbble:hover
+    {
+    background-color:#ea4c89
+    }
+    @media (max-width:767px)
+    {
+    .social-icons li.title
+    {
+        display:block;
+        margin-right:0;
+        font-weight:600
+    }
+    }
+    #mobileDataList:focus{
+        border-color: white;
+        box-shadow: none;
+    }
+</style>
+<style>
+    @import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+ #noalertscontainer {
+	 position: relative;
+	 margin: auto;
+	 overflow: hidden;
+	 width: 300px;
+	 height: 300px;
+}
+#alertscontainer {
+	 position: relative;
+	 margin: auto;
+	 overflow: hidden;
+	 width: 300px;
+	 height: 300px;
+}
+ h1 {
+	 font-size: 0.9em;
+	 font-weight: 100;
+	 letter-spacing: 3px;
+	 padding-top: 5px;
+	 color: #fcfcfc;
+	 padding-bottom: 5px;
+	 text-transform: uppercase;
+}
+ .green {
+	 color: #4ec07d;
+}
+ .red {
+	 color: #e96075;
+}
+ .alert {
+	 font-weight: 700;
+	 letter-spacing: 5px;
+}
+ button, .dot {
+	 cursor: pointer;
+}
+ #success-box {
+	 position: absolute;
+	 width: 100%;
+	 height: 100%;
+	 background: linear-gradient(to bottom right, #b0db7d 40%, #99dbb4 100%);
+	 border-radius: 20px;
+	 perspective: 40px;
+}
+ #error-box {
+	 position: absolute;
+	 width: 100%;
+	 height: 100%;
+	 background: linear-gradient(to bottom left, #ef8d9c 40%, #ffc39e 100%);
+	 border-radius: 20px;
+}
+ .dot {
+	 width: 8px;
+	 height: 8px;
+	 background: #fcfcfc;
+	 border-radius: 50%;
+	 position: absolute;
+	 top: 4%;
+	 right: 6%;
+}
+ .dot:hover {
+	 background: #c9c9c9;
+}
+ .two {
+	 right: 12%;
+	 opacity: 0.5;
+}
+ .face {
+	 position: absolute;
+	 width: 22%;
+	 height: 22%;
+	 background: #fcfcfc;
+	 border-radius: 50%;
+	 border: 1px solid #777;
+	 top: 21%;
+	 left: 37.5%;
+	 z-index: 2;
+	 animation: bounce 1s ease-in infinite;
+}
+ .face2 {
+	 position: absolute;
+	 width: 22%;
+	 height: 22%;
+	 background: #fcfcfc;
+	 border-radius: 50%;
+	 border: 1px solid #777;
+	 top: 21%;
+	 left: 37.5%;
+	 z-index: 2;
+	 animation: roll 3s ease-in-out infinite;
+}
+ .eye {
+	 position: absolute;
+	 width: 5px;
+	 height: 5px;
+	 background: #777;
+	 border-radius: 50%;
+	 top: 40%;
+	 left: 20%;
+}
+ .right {
+	 left: 68%;
+}
+ .mouth {
+	 position: absolute;
+	 top: 43%;
+	 left: 41%;
+	 width: 7px;
+	 height: 7px;
+	 border-radius: 50%;
+}
+ .happy {
+	 border: 2px solid;
+	 border-color: transparent #777 #777 transparent;
+	 transform: rotate(45deg);
+}
+ .sad {
+	 top: 49%;
+	 border: 2px solid;
+	 border-color: #777 transparent transparent #777;
+	 transform: rotate(45deg);
+}
+ .shadow {
+	 position: absolute;
+	 width: 21%;
+	 height: 3%;
+	 opacity: 0.5;
+	 background: #777;
+	 left: 40%;
+	 top: 43%;
+	 border-radius: 50%;
+	 z-index: 1;
+}
+ .scale {
+	 animation: scale 1s ease-in infinite;
+}
+ .move {
+	 animation: move 3s ease-in-out infinite;
+}
+ .message {
+	 position: absolute;
+	 width: 100%;
+	 text-align: center;
+	 height: 40%;
+	 top: 47%;
+}
+ .button-box {
+	 position: absolute;
+	 background: #fcfcfc;
+	 width: 50%;
+	 height: 15%;
+	 border-radius: 20px;
+	 top: 73%;
+	 left: 25%;
+	 outline: 0;
+	 border: none;
+	 box-shadow: 2px 2px 10px rgba(119, 119, 119, .5);
+	 transition: all 0.5s ease-in-out;
+}
+ .button-box:hover {
+	 background: #efefef;
+	 transform: scale(1.05);
+	 transition: all 0.3s ease-in-out;
+}
+ @keyframes bounce {
+	 50% {
+		 transform: translateY(-10px);
+	}
+}
+ @keyframes scale {
+	 50% {
+		 transform: scale(0.9);
+	}
+}
+ @keyframes roll {
+	 0% {
+		 transform: rotate(0deg);
+		 left: 25%;
+	}
+	 50% {
+		 left: 60%;
+		 transform: rotate(168deg);
+	}
+	 100% {
+		 transform: rotate(0deg);
+		 left: 25%;
+	}
+}
+ @keyframes move {
+	 0% {
+		 left: 25%;
+	}
+	 50% {
+		 left: 60%;
+	}
+	 100% {
+		 left: 25%;
+	}
+}
+ 
+</style>
+<style>
+    /* Loading CSS */
+    .loader {
+    --background: linear-gradient(135deg, #23C4F8, #275EFE);
+    --shadow: rgba(39, 94, 254, 0.28);
+    --text: #6C7486;
+    --page: rgba(255, 255, 255, 0.36);
+    --page-fold: rgba(255, 255, 255, 0.52);
+    --duration: 3s;
+    width: 200px;
+    height: 140px;
+    position: relative;
+    }
+    .loader:before, .loader:after {
+    --r: -6deg;
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    width: 120px;
+    top: 80%;
+    box-shadow: 0 16px 12px var(--shadow);
+    transform: rotate(var(--r));
+    }
+    .loader:before {
+    left: 4px;
+    }
+    .loader:after {
+    --r: 6deg;
+    right: 4px;
+    }
+    .loader div {
+    width: 100%;
+    height: 100%;
+    border-radius: 13px;
+    position: relative;
+    z-index: 1;
+    perspective: 600px;
+    box-shadow: 0 4px 6px var(--shadow);
+    background-image: var(--background);
+    }
+    .loader div ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+    }
+    .loader div ul li {
+    --r: 180deg;
+    --o: 0;
+    --c: var(--page);
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    transform-origin: 100% 50%;
+    color: var(--c);
+    opacity: var(--o);
+    transform: rotateY(var(--r));
+    animation: var(--duration) ease infinite;
+    }
+    .loader div ul li:nth-child(2) {
+    --c: var(--page-fold);
+    animation-name: page-2;
+    }
+    .loader div ul li:nth-child(3) {
+    --c: var(--page-fold);
+    animation-name: page-3;
+    }
+    .loader div ul li:nth-child(4) {
+    --c: var(--page-fold);
+    animation-name: page-4;
+    }
+    .loader div ul li:nth-child(5) {
+    --c: var(--page-fold);
+    animation-name: page-5;
+    }
+    .loader div ul li svg {
+    width: 90px;
+    height: 120px;
+    display: block;
+    }
+    .loader div ul li:first-child {
+    --r: 0deg;
+    --o: 1;
+    }
+    .loader div ul li:last-child {
+    --o: 1;
+    }
+    .loader span {
+    display: block;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 20px;
+    text-align: center;
+    color: var(--text);
+    }
+    @keyframes page-2 {
+    0% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    35%, 100% {
+        opacity: 0;
+    }
+    50%, 100% {
+        transform: rotateY(0deg);
+    }
+    }
+    @keyframes page-3 {
+    15% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+    35% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+    65%, 100% {
+        transform: rotateY(0deg);
+    }
+    }
+    @keyframes page-4 {
+    30% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    65%, 100% {
+        opacity: 0;
+    }
+    80%, 100% {
+        transform: rotateY(0deg);
+    }
+    }
+    @keyframes page-5 {
+    45% {
+        transform: rotateY(180deg);
+        opacity: 0;
+    }
+    65% {
+        opacity: 1;
+    }
+    80%, 100% {
+        opacity: 0;
+    }
+    95%, 100% {
+        transform: rotateY(0deg);
+    }
+    }
+    html {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    }
+    * {
+    box-sizing: inherit;
+    }
+    *:before, *:after {
+    box-sizing: inherit;
+    }
+    body .dribbble {
+    position: fixed;
+    display: block;
+    right: 24px;
+    bottom: 24px;
+    }
+    body .dribbble img {
+    display: block;
+    width: 76px;
+    }
+</style>
+<div id="desktop" style="position: relative;min-height: 100vh;">
+    <!-- Top Menu bar -->
+    <nav class="navbar navbar-dark bg-dark" style="position: fixed;top: 0;width: 100%;flex-wrap: nowrap;z-index: 50;">
+        <div class="container-fluid">
+            <!-- Logo -->
+            <a class="navbar-brand" href="{%url 'inventory_index'%}" style="display: flex;">
+                <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                <p class="lead" style="margin: auto; font-size: 20px;">Inventory Management System</p>
+            </a>
+            <!-- Mobile Search -->
+            <div style="display: flex; align-items: center;">
+                <div id="mobilesearch">
+                    <form action="{%url 'kits_list'%}" method="POST" style="display: flex;margin-right: 20px;justify-content: flex-end;">
+                    {%csrf_token%}
+                        <input class="form-control" type="search" list="datalistOptions" id="mobileDataList" name="searchthis" placeholder="Search by name" style="width: 250px;border-radius: 25px;background-color: #2b2b2b;height: 30px;color: #d3d3d3;padding-right: 20%;">
+                        <datalist id="datalistOptions">
+                            {%for item in items%}
+                                <option value="{{item.name}}">{{item.status}}</option>
+                            {%endfor%}
+                        </datalist>
+                        <button type="submit" style="background: none;border: none;color: white;position: absolute;margin-right: 10px;border-left: 1px solid white;height: 30px;display: flex;align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <!-- Logged in user -->
+                <span class="navbar-text" style="margin-right: 20px;text-overflow: clip;white-space: nowrap;">
+                    Logged in as {{user.username}}
+                </span>
+                <!-- Noti -->
+                <div style="display: flex;align-items: center;cursor: pointer;margin-right: 20px;position: relative;" onclick="checknoti()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16" style="color:rgb(255 255 255 / 55%);">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                    </svg>
+                    {%if num_alerts != 0%}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{num_alerts}}
+                    </span>
+                    {%endif%}
+                </div>
+                <!-- Cart -->
+                <a href="{%url 'kits_activecart'%}" style="display: flex;align-items: center;margin-right: 20px;position: relative;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="color:rgb(255 255 255 / 55%);">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                    {%if numitemsinkitcart != 0%}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{numitemsinkitcart}}
+                    </span>
+                    {%endif%}
+                </a>
+                <!-- Log out -->
+                <a href="{%url 'logout_view'%}" style="display: flex;align-items: center;">
+                    <button type="button" class="btn btn-outline-secondary" style="color: rgb(255 255 255 / 55%);border-radius: 25px; margin-right: 5px;height: 30px;display: flex;align-items: center;">Logout</button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loader -->
+    <div id="loader" style="display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 500;"> 
+        <div class="loader">
+            <div>
+                <ul>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div style="background-color: rgba(0, 0, 0, 0.780);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;filter: blur(8px);
+    -webkit-filter: blur(8px);display: none;" onclick="closeoverlay()" id="alertoverlay"></div>
+    <div id="noalertscontainer" style="position: fixed;left: 50%;transform: translate(-50%, -50%);z-index: 500;top:50%;display: none;">
+        <div id="success-box">
+          <div class="face">
+            <div class="eye"></div>
+            <div class="eye right"></div>
+            <div class="mouth happy"></div>
+          </div>
+          <div class="shadow scale"></div>
+          <div class="message"><h1 class="alert" style="margin-bottom: 0px;">rest easy</h1><p>there are no alerts now.</p></div>
+          <button class="button-box" style="top:80%;"><h1 class="green" style="padding-bottom: 0px;color: green;" onclick="closeoverlay()">continue</h1></button>
+        </div>
+    </div>
+    <div id="alertscontainer" style="position: fixed;left: 50%;transform: translate(-50%, -50%);z-index: 500;top:50%;display: none;" id="havealerts">
+        <div id="error-box" >
+            <div class="face2">
+              <div class="eye"></div>
+              <div class="eye right"></div>
+              <div class="mouth sad"></div>
+            </div>
+            <div class="shadow move"></div>
+            <div class="message"><h1 class="alert" style="margin-bottom: 0px;">uh oh!</h1><p>we have found some issues.</p></div>
+            <button class="button-box" style="top:80%;" onclick="gonoti()"><h1 class="green" style="padding-bottom: 0px;color: red;" onclick="closeoverlay()">continue</h1></button>
+          </div>
+    </div>
+
+    <!-- Right fixed settings for big screens -->
+    <div class="rightsettings" style="position: absolute;">
+        <h2 style="margin-bottom: 10%;">Search Settings</h2>
+        <p>Search by type</p>
+        <form class="searchsettingscheckbox" action="{%url 'kits_list'%}" method="POST" id="topsearchnavibar">
+            {%csrf_token%}
+            {%if itemtype == "all" or itemtype is None%}
+                <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;margin-top: 10px;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;margin-top: 10px;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%endif%}
+            {%if itemtype == "S" %}
+                <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;" value="S" onclick="changeshownitems(this)">Small Kit</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;" value="S" onclick="changeshownitems(this)">Small Kit</button>
+            {%endif%}
+            {%if itemtype == "B"%}
+                <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;" value="B" onclick="changeshownitems(this)">Big Kit</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;" value="B" onclick="changeshownitems(this)">Big Kit</button>
+            {%endif%}
+            {%for typechoice in typechoices%}
+                {%if itemtype == typechoice%}
+                    <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%else%}
+                    <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%endif%}
+            {%endfor%}
+            <button type="button" class="btn btn-outline-warning position-relative" style="border-radius: 25px;" value="cart" onclick="changeshownitems(this)">View Cart
+            {%if numitemsinkitcart != 0%}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{numitemsinkitcart}}
+            </span>
+            {%endif%}
+            </button>
+            <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+        </form>
+        <div class="searchsettingsinput">
+            <form action="{%url 'kits_list'%}" method="POST">
+            {%csrf_token%}
+                <label for="pcDataList" class="form-label">Search by name</label>
+                <input class="form-control" list="datalistOptions" name="searchthis" id="pcDataList" placeholder="Search by name">
+                    <datalist id="datalistOptions">
+                        {%for item in items%}
+                            <option value="{{item.name}}">{{item.status}}</option>
+                        {%endfor%}
+                    </datalist>
+            </form>
+        </div>
+        {%if user.username == "Jonas" or user.username == "sjbadmin" or user.username == "eriol"%}
+            <div>
+                <p>Advanced Options</p>
+                <div>
+                    <a href="{%url 'kitlogs'%}">
+                        <button type="button" class="btn btn-secondary">Show Order Logs</button>
+                    </a>
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="{%url 'addnewkit'%}">
+                        <button type="button" class="btn btn-secondary">Add New Kit</button>
+                    </a>
+                </div>
+            </div>
+        {%endif%}
+    </div>
+
+    <!-- Top settings for small screens -->
+    <div id="topsearchnavibardiv" style="margin-bottom: -50px;">
+        <form class="itemcontainer" action="{%url 'kits_list'%}" method="POST" style="justify-content: space-around;margin-top: 10%;">
+        {%csrf_token%}
+            {%if itemtype == "all" or itemtype is None%}
+                <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%endif%}
+            {%if itemtype == "S" %}
+                <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="S" onclick="changeshownitems(this)">Small Kit</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="S" onclick="changeshownitems(this)">Small Kit</button>
+            {%endif%}
+            {%if itemtype == "B"%}
+                <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="B" onclick="changeshownitems(this)">Big Kit</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="B" onclick="changeshownitems(this)">Big Kit</button>
+            {%endif%}
+            {%for typechoice in typechoices%}
+                {%if itemtype == typechoice%}
+                    <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%else%}
+                    <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%endif%}
+            {%endfor%}
+            <button type="button" class="btn btn-outline-warning position-relative" style="border-radius: 25px;" value="cart" onclick="changeshownitems(this)">View Cart
+            {%if numitemsinkitcart != 0%}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{numitemsinkitcart}}
+                </span>
+            {%endif%}
+            </button>
+            <a href="{%url 'kitlogs'%}">
+            <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;">View Logs</button>
+            </a>
+            <a href="{%url 'addnewkit'%}">
+                <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;">New Kit</button>
+            </a>
+            <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+        </form>
+    </div>
+
+    <!-- Item Containers -->
+    <div style="margin-top: 100px;margin-bottom: 100px;" id="contentpcitemcontainers">
+        {%if items|length == 0%}
+        <p style="text-align: center;display: block;margin: auto;color: rgba(255,255,255,.55);">There is nothing here now</p>
+        {%else%}
+            {%for item in items%}
+                <div class="itemcontainer">
+                    <div style="width: 200px; height: 200px;margin-left: 50px;">
+                        {%if item.image is None%}
+                            <img src="/static/inventoryresource/logo.png" style="width: auto; height: 200px;">
+                        {%else%}
+                            <img src="/static/inventoryresource/{{item.image}}" style="width: auto; height: 200px;">
+                        {%endif%}
+                    </div>
+                    <div style="margin-left: 8%;padding-right: 8%;width: 100%; border-right: 1px solid #d3d3d3;">
+                        <h2 style="font-size: 32px;">Kit {{item.name}}</h2>
+                        <p class="lead" style="font-size: 20px;">Status: <strong>{{item.status}}</strong></p>
+                        <p class="lead" style="font-size: 20px;">Type: <strong>{{item.kit_type}}</strong></p> 
+                        <p class="lead" style="font-size: 20px;">Expiry: <strong>{{item.nearest_expiry}}</strong></p> 
+                    </div>
+                    <div style="width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+                        {%if item.status == "In Cart"%}
+                            <div>
+                                <p class="lead" style="text-align: center;">In Active Cart</p>
+                            </div>
+                        {%elif item.status == "Unstocked"%}
+                            <a href="{% url 'kits_restock' item.name%}">
+                                <button type="button" class="btn btn-success" style="width: 94px;">Stock</button>
+                            </a>
+                        {%elif item.status == "In Use" and item.kitloancartitem.ordering_account != request.user%}
+                            <div>
+                                <p class="lead" style="margin-bottom: 10px;">Kit Loaned out by {{item.kitloancartitem.last.ordering_account.username}}</p>
+                            </div>
+                            {%if item.kitloancartitem.last.ordering_account == request.user%}
+                            <a href="{% url 'kits_return' item.name%}">
+                                <button type="button" class="btn btn-success" style="width: 94px;">Return</button>
+                            </a>
+                            {%endif%}
+                        {%elif cart_type == "withdraw"%}
+                            {%if item.status == "In Use"%}
+                                <div>
+                                    <p class="lead">No Action</p>
+                                </div>
+                            {%else%}
+                                <a href="{% url 'kits_withdraw' item.name %}">
+                                    <button type="button" class="btn btn-danger">Withdraw</button>
+                                </a>
+                            {%endif%}
+                        {%elif cart_type == "deposit"%}
+                            {%if item.status == "Available"%}
+                                <div>
+                                    <p class="lead">No Action</p>
+                                </div>
+                            {%else%}
+                                <a href="{% url 'kits_return' item.name%}">
+                                    <button type="button" class="btn btn-success" style="width: 94px;">Return</button>
+                                </a>
+                            {%endif%}
+                        {%elif cart_type == "empty"%}
+                            {%if item.status == "Available"%}
+                                <a href="{% url 'kits_withdraw' item.name %}">
+                                    <button type="button" class="btn btn-danger" style="margin-bottom: 20%;">Withdraw</button>
+                                </a>
+                            {%elif item.status == "In Use"%}
+                                <a href="{% url 'kits_return' item.name%}">
+                                    <button type="button" class="btn btn-success" style="width: 94px;">Return</button>
+                                </a>
+                            {%endif%}
+                        {%endif%}
+                    </div>
+                    </div>
+            {%endfor%}
+        {%endif%}
+    </div>
+
+    <!-- Pagination -->
+    {% if items.has_other_pages %}
+        <ul class="pagination justify-content-center" style="margin-top: 50px; padding-bottom: 50px;">
+            {% if items.has_previous %}
+            <li class="page-item" ><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" style="background-color: #121212;color: gray;">Previous</span>
+            </li>
+            {% endif %}
+            {% for i in page_range %}
+                {% if items.number == i %}
+                    <li class="page-item active"><span class="page-link" style="border-style: solid; border-color: #ddd; border-width: 1px; background-color: #28a745;">{{ i }}<span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li class="page-item" ><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if items.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" style="background-color: #121212;color: gray;">Next</span>
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+</div>
+
+<div id="mobile" style="display: none;position: relative;min-height: 100vh;">
+     <!-- Top Menu bar -->
+     <nav class="navbar navbar-dark bg-dark" style="position:fixed;top: 0;width: 100%;flex-wrap: nowrap;z-index: 10;">
+        <div class="container-fluid">
+            <div id="smallscreenlogo">
+                <a class="navbar-brand" href="{%url 'inventory_index'%}" style="display: flex;">
+                    <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+                    <p class="lead" style="margin: auto; font-size: 20px;">IMS</p>
+                </a>
+            </div>
+            <div style="display: flex;">
+                <!-- Menu Icon -->
+                <div onclick="showmenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="align-self: center;">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loader -->
+    <div id="loader" style="display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 500;"> 
+        <div class="loader">
+            <div>
+                <ul>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                    <li><svg viewBox="0 0 90 120" fill="currentColor">
+                            <path d="M90,0 L90,120 L11,120 C4.92486775,120 0,115.075132 0,109 L0,11 C0,4.92486775 4.92486775,0 11,0 L90,0 Z M71.5,81 L18.5,81 C17.1192881,81 16,82.1192881 16,83.5 C16,84.8254834 17.0315359,85.9100387 18.3356243,85.9946823 L18.5,86 L71.5,86 C72.8807119,86 74,84.8807119 74,83.5 C74,82.1745166 72.9684641,81.0899613 71.6643757,81.0053177 L71.5,81 Z M71.5,57 L18.5,57 C17.1192881,57 16,58.1192881 16,59.5 C16,60.8254834 17.0315359,61.9100387 18.3356243,61.9946823 L18.5,62 L71.5,62 C72.8807119,62 74,60.8807119 74,59.5 C74,58.1192881 72.8807119,57 71.5,57 Z M71.5,33 L18.5,33 C17.1192881,33 16,34.1192881 16,35.5 C16,36.8254834 17.0315359,37.9100387 18.3356243,37.9946823 L18.5,38 L71.5,38 C72.8807119,38 74,36.8807119 74,35.5 C74,34.1192881 72.8807119,33 71.5,33 Z"></path>
+                        </svg></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div style="background-color: rgba(0, 0, 0, 0.780);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;filter: blur(8px);
+    -webkit-filter: blur(8px);display: none;" onclick="closeoverlay()" id="alertoverlay"></div>
+    <div id="noalertscontainer" style="position: fixed;left: 50%;transform: translate(-50%, -50%);z-index: 500;top:50%;display: none;">
+        <div id="success-box">
+          <div class="face">
+            <div class="eye"></div>
+            <div class="eye right"></div>
+            <div class="mouth happy"></div>
+          </div>
+          <div class="shadow scale"></div>
+          <div class="message"><h1 class="alert" style="margin-bottom: 0px;">rest easy</h1><p>there are no alerts now.</p></div>
+          <button class="button-box" style="top:80%;"><h1 class="green" style="padding-bottom: 0px;color: green;" onclick="closeoverlay()">continue</h1></button>
+        </div>
+    </div>
+    <div id="alertscontainer" style="position: fixed;left: 50%;transform: translate(-50%, -50%);z-index: 500;top:50%;display: none;" id="havealerts">
+        <div id="error-box" >
+            <div class="face2">
+              <div class="eye"></div>
+              <div class="eye right"></div>
+              <div class="mouth sad"></div>
+            </div>
+            <div class="shadow move"></div>
+            <div class="message"><h1 class="alert" style="margin-bottom: 0px;">uh oh!</h1><p>we have found some issues.</p></div>
+            <button class="button-box" style="top:80%;" onclick="gonoti()"><h1 class="green" style="padding-bottom: 0px;color: red;" onclick="closeoverlay()">continue</h1></button>
+          </div>
+    </div>
+    <!-- Menu -->
+    <div style="background-color: rgba(0, 0, 0, 0.473);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;display: none;" onclick="closemenu()" id="overlay"></div>
+    <div id="menu" style="position: fixed;overflow: auto; height: 100%; right: 0;top: 0;z-index: 100;padding: 5vw 15vw;-webkit-backdrop-filter: blur(6vw);backdrop-filter: blur(6vw);background-color: #2125299d;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);transform: translateX(100vw);">
+        <p class="display-6" style="text-align: center;">Kits</p>
+        <p class="lead" style="margin-top:2vw;color: gray;">Logged in as {{user.username}}</p>
+        <form action="{%url 'kits_list'%}" method="POST" id="topsearchnavibar" style="display: flex;flex-direction: column;">
+        {%csrf_token%}
+            {%if itemtype == "all" or itemtype is None%}
+                <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;margin-top: 5vw;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-success" style="border-radius: 25px;margin-top: 5vw;" value="all" onclick="changeshownitems(this)">Show All</button>
+            {%endif%}
+            {%for typechoice in typechoices%}
+                {%if itemtype == typechoice%}
+                    <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;margin-top: 5vw;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%else%}
+                    <button type="button" class="btn btn-outline-success" style="border-radius: 25px;margin-top: 5vw;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+                {%endif%}
+            {%endfor%}
+            <button type="button" class="btn btn-outline-warning position-relative" style="border-radius: 25px;margin-top: 5vw;" value="cart" onclick="changeshownitems(this)">View Cart
+                {%if numitemsinkitcart != 0%}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{numitemsinkitcart}}
+                    </span>
+                {%endif%}
+            </button>
+            <a href="{%url 'kitlogs'%}">
+            <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">View Logs</button>
+            </a>
+            <a href="{%url 'addnewkit'%}">
+                <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Add Kit</button>
+                </a>
+            <a href="{%url 'logout_view_sjb'%}">
+                <button type="button" class="btn btn-outline-danger" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Logout</button>
+            </a>
+            <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+        </form>
+    </div>
+
+    <!-- Search Bar -->
+    <form action="{%url 'kits_list'%}" method="POST" style="margin-top: 90px;" class="search" id="searchform">
+    {%csrf_token%}
+        <input class="search-box" type="search" list="datalistOptions" id="mobileDataList" name="searchthis" placeholder="What are you looking for">
+        <datalist id="datalistOptions">
+            {%for item in items%}
+                <option value="{{item.name}}"></option>
+            {%endfor%}
+        </datalist>
+        <span class="search-button">
+          <span class="search-icon"></span>
+        </span>
+    </form>
+
+    <!-- Quick Actions -->
+    <div style="width: 75vw;display: flex;align-items: center;justify-content: space-around;margin: auto;margin-top: 20px;">
+        <div onclick="checknoti()">
+            <div style="display: flex;border: 1px solid #ffc107;border-radius: 25px;padding: 1vw 2vw;color: #ffc107;align-items: center;position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="3vw" height="3vw" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16" style="margin-right: 2vw;">
+                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                </svg>
+                <p style="font-size: 3vw;margin: 0px;">Alerts</p>
+                {%if num_alerts != 0%}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{num_alerts}}
+                    </span>
+                {%endif%}
+            </div>
+        </div>
+        <a href="{%url 'kitlogs'%}">
+            <div style="display: flex;border: 1px solid #ffc107;border-radius: 25px;padding: 1vw 2vw;color: #ffc107;align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="3vw" height="3vw" fill="currentColor" class="bi bi-journal-text" viewBox="0 0 16 16" style="margin-right: 2vw;">
+                    <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                    <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
+                    <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
+                </svg>
+                <p style="font-size: 3vw;margin: 0px;">View Logs</p>
+            </div>
+        </a>
+        <a href="{%url 'kits_activecart'%}">
+            <div style="display: flex;border: 1px solid #ffc107;border-radius: 25px;padding: 1vw 2vw;color: #ffc107;align-items: center;position: relative;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="3vw" height="3vw" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="margin-right: 2vw;">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                <p style="font-size: 3vw;margin: 0px;">View Cart</p>
+                {%if numitemsinkitcart != 0%}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{numitemsinkitcart}}
+                </span>
+                {%endif%}
+            </div>
+        </a>
+    </div>
+
+
+    <!-- Item Containers -->
+    <div style="margin-top: 5%;">
+        {%if items|length == 0%}
+        <p style="text-align: center;display: block;margin: auto;color: rgba(255,255,255,.55);">There is nothing here now</p>
+        {%else%}
+            {%for item in items%}
+                <div class="itemcontainermobile">
+                    <div>
+                        {%if item.image is None%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 100%;">
+                        {%else%}
+                            <img src="/static/inventoryresource/{{item.image}}" style="width: 100%;">
+                        {%endif%}
+                    </div>
+                    <div style="padding: 5vw;">
+                        <h2 style="font-size: 3.5vw;">Kit {{item.name}}</h2>
+                        <p class="lead" style="font-size: 3vw;">Status: <strong>{{item.status}}</strong></p>
+                        <p class="lead" style="font-size: 3vw;">Type: <strong>{{item.kit_type}}</strong></p> 
+                        <p class="lead" style="font-size: 3vw;">Expiry: <strong>{{item.nearest_expiry}}</strong></p> 
+                    </div>
+                    <div style="display: flex;flex-direction: column;align-items: center;justify-content: center;text-align: center;">
+                        {%if item.status == "In Cart"%}
+                            <div>
+                                <p class="lead" style="text-align: center;font-size: 3vw;">In Cart</p>
+                            </div>
+                        {%elif item.status == "Unstocked"%}
+                            <a href="{% url 'kits_restock' item.name%}">
+                                <button type="button" class="btn btn-success" style="font-size: 3vw;text-align: center;">Stock</button>
+                            </a>
+                        {%elif item.status == "In Use" and item.kitloancartitem.ordering_account != request.user%}
+                            <div>
+                                <p class="lead" style="margin-bottom: 2vw;font-size: 3vw;text-align: center;">In Use by <br>{{item.kitloancartitem.last.ordering_account.username}}</p>
+                            </div>
+                            {%if item.kitloancartitem.last.ordering_account == request.user%}
+                            <a href="{% url 'kits_return' item.name%}">
+                                <button type="button" class="btn btn-success" style="font-size: 3vw;text-align: center;">Return</button>
+                            </a>
+                            {%endif%}
+                        {%elif cart_type == "withdraw"%}
+                            {%if item.status == "In Use"%}
+                                <div>
+                                    <p class="lead" style="font-size: 3vw;text-align: center;">No Action</p>
+                                </div>
+                            {%else%}
+                                <a href="{% url 'kits_withdraw' item.name %}">
+                                    <button type="button" class="btn btn-danger" style="font-size: 3vw;text-align: center;">Withdraw</button>
+                                </a>
+                            {%endif%}
+                        {%elif cart_type == "deposit"%}
+                            {%if item.status == "Available"%}
+                                <div>
+                                    <p class="lead">No Action</p>
+                                </div>
+                            {%else%}
+                                <a href="{% url 'kits_return' item.name%}">
+                                    <button type="button" class="btn btn-success" style="font-size: 3vw;text-align: center;">Return</button>
+                                </a>
+                            {%endif%}
+                        {%elif cart_type == "empty"%}
+                            {%if item.status == "Available"%}
+                                <a href="{% url 'kits_withdraw' item.name %}">
+                                    <button type="button" class="btn btn-danger" style="font-size: 3vw;text-align: center;">Withdraw</button>
+                                </a>
+                            {%elif item.status == "In Use"%}
+                                <a href="{% url 'kits_return' item.name%}">
+                                    <button type="button" class="btn btn-success" style="font-size: 3vw;text-align: center;">Return</button>
+                                </a>
+                            {%endif%}
+                        {%endif%}
+                    </div>
+                    </div>
+            {%endfor%}
+        {%endif%}
+    </div>
+
+    <div>
+        <!-- Pagination -->
+        {% if items.has_other_pages %}
+            <ul class="pagination justify-content-center" style="margin-top: 50px; padding-bottom: 50px;">
+                {% if items.has_previous %}
+                <li class="page-item" ><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link" style="background-color: #121212;color: gray;">Previous</span>
+                </li>
+                {% endif %}
+                {% for i in page_range %}
+                    {% if items.number == i %}
+                        <li class="page-item active"><span class="page-link" style="border-style: solid; border-color: #ddd; border-width: 1px; background-color: #28a745;">{{ i }}<span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                        <li class="page-item" ><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if items.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" style="background-color: #121212;color: gray;">Next</span>
+                    </li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+  <!-- Site footer -->
+  <footer class="site-footer" style="width: 100%;">
+    <div class="container" style="padding: 20px;">
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+        <h6>About IMS</h6>
+        <p class="text-justify">Inventory Management System for NHSJB</p>
+        </div>
+
+        <div class="col-xs-6 col-md-3">
+        <h6>Categories</h6>
+        <ul class="footer-links">
+            <li><a href="{%url 'item_list'%}">Items</a></li>
+            <li><a href="{%url 'kits_list'%}">Kits</a></li>
+            <li><a href="{%url 'notifications'%}">Alerts</a></li>
+        </ul>
+        </div>
+
+        <div class="col-xs-6 col-md-3">
+        <h6>Quick Links</h6>
+        <ul class="footer-links">
+            <li><a href="https://nhhs-sjb.org">Portal</a></li>
+            <li><a href="https://github.com/Jonas-01/playground/tree/main/inventory" target="_blank">GitHub</a></li>
+        </ul>
+        </div>
+    </div>
+    <hr>
+    </div>
+    <div class="container">
+    <div class="row">
+        <div class="col-md-8 col-sm-6 col-xs-12">
+            <p class="copyright-text">Source Code is on <a href="https://github.com/Jonas-01/playground/tree/main/inventory" target="_blank">Github!</a></p>
+        </div>
+    </div>
+    </div>
+</footer>
+
+<script>
+    var mobile=false;
+    function gonoti(){
+        window.location = "{%url 'notifications'%}"
+    }
+    document.addEventListener('scroll', function(e) {
+        if (!mobile){
+            var limit = parseInt(document.getElementById('contentpcitemcontainers').offsetHeight) - parseInt(document.querySelector('.rightsettings').offsetHeight)
+            if (limit<0){
+                var num=0;
+            }else if (parseInt(window.scrollY)>limit && limit>0){
+                var num = limit + "px";
+            } else if (parseInt(window.scrollY)<0){
+                var num = 0;
+            } else {
+                var num = window.scrollY + "px";
+            }
+            document.querySelector('.rightsettings').style.marginTop=num;
+        }
+    });
+    function checknoti(){
+        document.getElementById('loader').style.display="block";
+        document.getElementById('alertoverlay').style.display="block";
+        document.querySelector('body').style.overflow="hidden";
+        $.ajax({
+            type: "POST",
+            url: "{%url 'item_list'%}",
+            data: {
+                "alert": "alert",
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value
+            },
+            success: function(data) {
+                if (data['responseText'] == false){
+                    document.getElementById('loader').style.display="none";
+                    document.getElementById('alertscontainer').style.display="block";
+                } else {
+                    document.getElementById('loader').style.display="none";
+                    document.getElementById('noalertscontainer').style.display="block";
+                }
+            },
+        });
+    }
+    function closeoverlay(){
+        document.getElementById('alertoverlay').style.display="none";
+        document.getElementById('noalertscontainer').style.display="none";
+        document.getElementById('alertscontainer').style.display="none";
+        document.querySelector('body').style.overflow="initial";
+    }
+    jQuery(document).ready(function($) {
+        $('.search-button').parent().toggleClass('open');
+        let check = false;
+        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+        if (check){
+            mobile=true;
+            document.getElementById('desktop').style.display = "none";
+            document.getElementById('desktop').innerHTML = "";
+            document.getElementById('mobile').style.display = "block";
+        }
+    });
+    function changeshownitems(button) {
+        document.querySelector('#itemtype').value = button.value
+        document.querySelector('#topsearchnavibar').submit()
+    }
+    function showmenu(){
+        document.getElementById('menu').style.animationName = "moverightmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(0px)";
+        document.getElementById('overlay').style.display="block";
+        document.querySelector('body').style.overflow= "hidden";
+    }
+    $('.search-button').click(function(){
+        document.getElementById('searchform').submit()
+    });
+    function closemenu(){
+        document.getElementById('menu').style.animationName = "movebackmenu";
+        document.getElementById('menu').style.animationDuration = '.5s';
+        document.getElementById('menu').style.animationFillMode = "forward"; 
+        document.getElementById('menu').style.transform = "translateX(100vw)";
+        document.getElementById('overlay').style.display="none";
+        document.querySelector('body').style.overflow= "auto";
+    }
+</script>
+
+{% endblock %}

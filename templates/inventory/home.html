@@ -1,0 +1,44 @@
+{% extends "inventory/template.html" %}
+
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock head_meta %}
+
+
+{% block body %}
+<style>
+    .bg {
+    /* The image used */
+    background-image: url("/static/inventoryresource/A6.jpg");
+
+    /* Full height */
+    height: 100%; 
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    flex-wrap: wrap;
+    }
+</style>
+
+<div class="bg">
+    <img src="/static/inventoryresource/logo.png" style="width: 150px; margin-bottom: 20px; animation: fadeinmovedown 1s forwards;">
+    <h1 class="display-3" style="color: black;animation: fadeinmovedown 1s forwards;">Welcome to IMS</h1>
+    <p class="lead" style="color: black; font-size: 35px; margin-bottom: 20px;animation: fadeinmovedown 1s forwards;">Select one option</p>
+    <a href="{% url 'item_list'%}">
+        <button type="button" class="btn btn-outline-primary" style="margin-bottom: 20px; width: 220px; height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">First Aid</button>
+    </a>
+    <a href="{% url 'kits_list'%}">
+        <button type="button" class="btn btn-outline-primary"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Kits</button>
+    </a>
+    <a href="{% url 'notifications'%}" onclick="loading()">
+        <button type="button" class="btn btn-outline-primary"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Notifications</button>
+    </a>
+</div>
+
+{% endblock %}

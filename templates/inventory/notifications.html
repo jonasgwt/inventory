@@ -1,0 +1,772 @@
+{% load static %}
+{% load new_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Inventory{% endblock %}</title>
+        <link rel="shortcut icon" type="image/png" href="/static/inventoryresource/logo.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+        <script src="/static/node_modules/smooth-scrollbar/dist/smooth-scrollbar.js"></script>
+        <script src="/static/node_modules/smooth-scrollbar/dist/plugins/overscroll.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+        <!-- 
+        <script src="//code.jquery.com/jquery.min.js"></script>
+        -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    </head>
+    <body>
+        <style>
+            @import url('https://rsms.me/inter/inter.css');
+        
+            html,
+            body {
+            background: #000;
+            }
+        
+            body {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -1px;
+            text-align: center;
+            font-size: 20px;
+            height: 100vh;
+            color: #fff;
+            margin: 0;
+            }
+        
+            .hero {
+            background: url('https://wallpaperaccess.com/full/346769.png') no-repeat center center;
+            justify-content: center;
+            background-size: cover;
+            flex-direction: column;
+            border-radius: 10px;
+            align-items: center;
+            position: fixed;
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            }
+        
+            .down {
+            text-align: center;
+            position: absolute;
+            opacity: 0.6;
+            height: 40px;
+            width: 100%;
+            bottom: 0;
+            }
+        
+            .content {
+            box-shadow: 0 0 100px rgba(0,0,0,0.4);
+            padding-bottom: 40px;
+            position: relative;
+            background: #000;
+            top: 100vh;
+            display: flex;
+            min-height: 2000px;
+            }
+            @keyframes moverightmenu {
+                from {transform: translateX(100vw); transform-origin: right;}
+                to { transform: translateX(0) ; transform-origin: right;}
+            }
+            @keyframes movebackmenu {
+                from {transform: translateX(0); transform-origin: right;}
+                to { transform: translateX(100vw) ; transform-origin: right;}
+            }
+            @keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+            @keyframes fadeout {
+                from { opacity: 1; }
+                to   { opacity: 0; }
+            }
+            #showmenu:hover{
+                cursor: pointer;
+            }
+        </style>
+        <style>
+            @import url(https://fonts.googleapis.com/css?family=Roboto:900);
+            *, *:before, *:after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            .expireglow {
+                position: relative;
+                margin: auto;
+                padding-right: 1.5rem;
+                padding-left: 1.5rem;
+                font-size: 1rem;
+                line-height: 3rem;
+                text-decoration: none;
+                color: white;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                background-image: linear-gradient(160deg, #e84444, #c13738);
+                border-radius: 30px;
+                cursor: pointer;
+                user-select: none;
+                box-shadow: 0 0 0 0 #e84444, 0.5rem 0.5rem 30px #9a0b0b;
+                transition: box-shadow 0.6s;
+            }
+            .expireglow:hover {
+                /*box-shadow: 0 0 60px 2px #ea4546, 0.5rem 0.5rem 30px #9a0b0b;*/
+                cursor: default;
+            }
+            .expireglow:after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                bottom: 2px;
+                left: 2px;
+                border-radius: 30px;
+                background-image: linear-gradient(170deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+                pointer-events: none;
+            }
+            .alertglow {
+                position: relative;
+                margin: auto;
+                padding-right: 1.5rem;
+                padding-left: 1.5rem;
+                font-size: 1rem;
+                line-height: 3rem;
+                text-decoration: none;
+                color: white;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                background-image: linear-gradient(160deg, #c5a600, #a56b00);
+                border-radius: 30px;
+                cursor: pointer;
+                user-select: none;
+                box-shadow: 0 0 0 0 #c69100, 0.5rem 0.5rem 30px #c69000;
+                transition: box-shadow 0.6s;
+            }
+            .alertglow:hover {
+                /*box-shadow: 0 0 60px 2px #c5b401, 0.5rem 0.5rem 30px #dc7c1d;*/
+                cursor: default;
+            }
+            .alertglow:after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                bottom: 2px;
+                left: 2px;
+                border-radius: 30px;
+                background-image: linear-gradient(170deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+                pointer-events: none;
+            }
+        </style>
+        <style>
+            .btn-outline-warning:hover {
+                color: #000;
+                background-color: #ffc107;
+                border-color: #ffc107;
+                box-shadow: none!important;
+            }
+        </style>
+        <style>
+ * {
+	 box-sizing: border-box;
+	 padding: 0;
+	 margin: 0;
+}
+ .switch-button {
+    background: rgb(193,55,56);
+background: linear-gradient(270deg, rgba(193,55,56,1) 0%, rgba(196,195,0,1) 100%);
+	 border-radius: 30px;
+	 overflow: hidden;
+	 width: 240px;
+	 text-align: center;
+	 font-size: 18px;
+	 letter-spacing: 1px;
+	 color: #155fff;
+	 position: relative;
+	 padding-right: 120px;
+	 position: relative;
+     font-family: sans-serif;
+     margin-bottom: 50px;
+}
+.switch-button-mobile {
+    background: rgb(193,55,56);
+background: linear-gradient(270deg, rgba(193,55,56,1) 0%, rgba(196,195,0,1) 100%);
+	 border-radius: 30px;
+	 overflow: hidden;
+	 width: 260px;
+	 text-align: center;
+	 font-size: 4vw;
+	 letter-spacing: 1px;
+	 color: #155fff;
+	 position: relative;
+	 padding-right: 120px;
+	 position: relative;
+     font-family: sans-serif;
+     margin-bottom: 50px;
+}
+ .switch-button:before {
+	 content: "Warnings";
+	 position: absolute;
+	 top: 0;
+	 bottom: 0;
+	 right: 0;
+	 width: 120px;
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 z-index: 3;
+	 pointer-events: none;
+     color: black;
+}
+.switch-button-mobile:before {
+	 content: "Warnings";
+	 position: absolute;
+	 top: 0;
+	 bottom: 0;
+	 right: 0;
+	 width: 130px;
+	 display: flex;
+	 align-items: center;
+	 justify-content: center;
+	 z-index: 3;
+	 pointer-events: none;
+     color: black;
+     font-size: 4vw;
+}
+ .switch-button-checkbox {
+	 cursor: pointer;
+	 position: absolute;
+	 top: 0;
+	 left: 0;
+	 bottom: 0;
+	 width: 100%;
+	 height: 100%;
+	 opacity: 0;
+	 z-index: 2;
+}
+ .switch-button-checkbox:checked + .switch-button-label:before {
+	 transform: translateX(120px);
+	 transition: transform 300ms linear;
+}
+ .switch-button-checkbox + .switch-button-label {
+	 position: relative;
+	 padding: 15px 0;
+	 display: block;
+	 user-select: none;
+	 pointer-events: none;
+}
+ .switch-button-checkbox + .switch-button-label:before {
+	 content: "";
+	 background: #fff;
+	 height: 100%;
+	 width: 100%;
+	 position: absolute;
+	 left: 0;
+	 top: 0;
+	 border-radius: 30px;
+	 transform: translateX(0);
+	 transition: transform 300ms;
+}
+ .switch-button-checkbox + .switch-button-label .switch-button-label-span {
+	 position: relative;
+}
+label {
+    display: inline-block;
+    margin-bottom: 0px;
+}
+ 
+        </style>
+        <!-- Menu -->
+        <div style="background-color: rgba(0, 0, 0, 0.473);position: fixed;height: 100%;width: 100%;z-index: 50;top:0;display: none;" onclick="closemenu()" id="overlay"></div>
+        <div id="menu" style="position: fixed;overflow: auto; height: 100%; right: 0;top: 0;z-index: 100;padding: 5vw 15vw;-webkit-backdrop-filter: blur(6vw);backdrop-filter: blur(6vw);background-color: #2125299d;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);transform: translateX(100vw);">
+            <p class="display-6" style="text-align: center;">Notifications</p>
+            <p class="lead" style="margin-top:2vw;color: gray;text-align: center;">Logged in as {{user.username}}</p>
+            <form action="{%url 'item_list'%}" method="POST" id="topsearchnavibar" style="display: flex;flex-direction: column;">
+                <a href="{%url 'logout_view_sjb'%}">
+                    <button type="button" class="btn btn-outline-danger" style="border-radius: 25px;margin-top: 5vw;width: 100%;">Logout</button>
+                </a>
+            </form>
+        </div>
+        <div class="hero">
+            <div onclick="showmenu()" style="position:absolute;z-index: 1000;right: 3%;top:3%;" id="showmenu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16" style="align-self: center;display:none;" id="mobilesvg">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16" style="align-self: center;" id="pcsvg">
+                    <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                    <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                  </svg>
+            </div>
+            <div id="tohomemobile" style="position:absolute;z-index: 1000;left: 3%;top:3%;display: none;" onclick="tohome()">
+                <img src="/static/inventoryresource/logo.png" style="width: 46px;height: 46px;">
+            </div>
+            <h1 style="margin-bottom: 10px;font-size: 50px;text-shadow: 2px 2px #0000006c;font-family: sans-serif;">Notifications.</h1>
+            <p class="lead" style="text-shadow: 2px 2px #0000006c;font-family: 'Inter';">Made for you.</p>
+            <div class="down">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+            </div>
+            <button type="button" class="btn btn-outline-light position-relative" style="margin-bottom: 20px;" onclick="itemexpiryfirstbutton()"><p style="margin: 0px;backdrop-filter: blur(5px);">Item Expiry Alerts</p>
+                {%if itemexpiry|addlength:itemwarn > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{itemexpiry|addlength:itemwarn}}
+                </span>
+                {%endif%}
+            </button>
+            <button type="button" class="btn btn-outline-light position-relative" style="margin-bottom: 20px;" onclick="loanexpiryfirstbutton()"><p style="margin: 0px;backdrop-filter: blur(5px);">Loan Expiry Alerts</p>
+                {%if loanexpiry|addlength:loanwarn > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{loanexpiry|addlength:loanwarn}}
+                </span>
+                {%endif%}
+            </button>
+            <button type="button" class="btn btn-outline-light position-relative" style="margin-bottom: 20px;" onclick="lowqtyfirstbutton()"><p style="margin: 0px;backdrop-filter: blur(5px);">Low Quantity Alerts</p>
+                {%if lowqtyalerts|length > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{lowqtyalerts|length}}
+                </span>
+                {%endif%}
+            </button>
+          </div>
+        <div class="content" id="pccontent">
+            <div style="margin-top: 100px;display: flex;align-items: center;width: 100%;flex-direction: column;margin-bottom: 100px;">
+                <div style="border:1px solid #d3d3d3;border-radius: 25px;margin-bottom: 50px;padding: 20px;width: 900px;display: flex;justify-content: space-evenly;
+                background-image: linear-gradient(160deg, #e8444499, #c13738);">
+                    <button type="button" class="btn btn-outline-warning" style="color: #000;background-color: #ffc107;border-color: #ffc107;" onclick="itemexpiry(this)" id="itemexpirybutton">Item Expiry</button>
+                    <button type="button" class="btn btn-outline-warning" style="box-shadow: 2px 3px #fcbe07;" onclick="loanexpiry(this)" id="loanexpirybutton">Loan Expiry</button>
+                    <button type="button" class="btn btn-outline-warning" style="box-shadow: 2px 3px #fcbe07;" onclick="lowqty(this)" id="lowqtybutton">Low Item Quantity</button>
+                </div>
+                <div class="switch-button">
+                    <input class="switch-button-checkbox" type="checkbox" onclick="changesubcat(this)"></input>
+                    <label class="switch-button-label" for=""><span class="switch-button-label-span" style="color: black;">Alerts</span></label>
+                </div>
+                <div id="loanalerts" style="display: none;">
+                    <div id="loanexpiry">
+                    {%if loanexpiry|length == 0%}
+                    <p>There is nothing here now..</p>
+                    {%else%}
+                    {%for alert in loanexpiry%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 900px;padding: 10px;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;" class="expireglow">
+                            <img src="/static/inventoryresource/loan.png" style="width: 150px;height: 150px;">
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start; padding-left: 5%;border-left: 1px solid #d3d3d3;
+                            margin-left: -5%;">
+                                <p style="font-size: 30px;"><strong>{{alert.category}}</strong></p>
+                                <p class="lead" style="margin: 0px;">Expiry: <strong>{{alert.loan.loan_end_date}}</strong></p>
+                                <p class="lead" style="margin: 0px;">Loaned out by: <strong>{{alert.loan.ordering_account}}</strong></p>
+                                <p class="lead">Loaned to: <strong>{{alert.loan.loanee_name}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Items: 
+                                {%for loancart in alert.loan.loancart.all%}
+                                <p class="lead"><strong>{{loancart.quantityopen|add:loancart.quantityunopened}}x {{loancart.item.item.name}}; Expiry: {{loancart.item.expirydate}}</strong></p>
+                                {%endfor%}
+                                </p>
+                            </div>
+                        </div>
+                    {%endfor%}
+                    {%endif%}
+                    </div>
+                    <div id="loanwarn" style="display: none;">
+                        {%if loanwarn|length == 0%}
+                        <p>There is nothing here now..</p>
+                        {%else%}
+                        {%for alert in loanwarn%}
+                            <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 900px;padding: 10px;display: flex;justify-content: space-evenly;
+                            align-items: center;margin-bottom: 50px;" class="alertglow" >
+                                <img src="/static/inventoryresource/loan.png" style="width: 150px;height: 150px;">
+                                <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start; padding-left: 5%;border-left: 1px solid #d3d3d3;
+                                margin-left: -5%;">
+                                    <p style="font-size: 30px;"><strong>{{alert.category}}</strong></p>
+                                    <p class="lead" style="margin: 0px;">Expiring on: <strong>{{alert.loan.loan_end_date}}</strong></p>
+                                    <p class="lead" style="margin: 0px;">Loaned out by: <strong>{{alert.loan.ordering_account}}</strong></p>
+                                    <p class="lead">Loaned to: <strong>{{alert.loan.loanee_name}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;">Items: 
+                                    {%for loancart in alert.loan.loancart.all%}
+                                    <p class="lead"><strong>{{loancart.quantityopen|add:loancart.quantityunopened}}x {{loancart.item.item.name}}; Expiry: {{loancart.item.expirydate}}</strong></p>
+                                    {%endfor%}
+                                    </p>
+                                </div>
+                            </div>
+                        {%endfor%}
+                        {%endif%}
+                    </div>
+                </div>
+                <div id="itemalerts">
+                    <div id="itemexpiry">
+                    {%if itemexpiry|length == 0%}
+                    <p>There is nothing here now..</p>
+                    {%else%}
+                    {%for alert in itemexpiry%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 900px;padding: 10px;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;" class="expireglow">
+                            {%if alert.itemexpiry.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                            {%elif alert.kit.image%}
+                            <img src="/static/inventoryresource/{{alert.kit.image}}" style="width: 150px;height: 150px;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start; padding-left: 5%;border-left: 1px solid #d3d3d3;
+                            margin-left: -5%;">
+                                {%if alert.itemexpiry%}
+                                <p style="font-size: 30px;"><strong>{{alert.itemexpiry.item.name}}</strong></p>
+                                <p class="lead" style="margin: 0px;">Status: <strong>Expired</strong></p>
+                                <p class="lead" style="margin: 0px;">Expiry: <strong>{{alert.itemexpiry.expirydate}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Opened Qty: <strong>{{alert.itemexpiry.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Unopened Qty: <strong>{{alert.itemexpiry.quantityunopened}}</strong></p>
+                                {%else%}
+                                <p style="font-size: 30px;"><strong>Kit {{alert.kit.name}}</strong></p>
+                                <p class="lead" style="margin: 0px;">Status: <strong>Expired</strong></p>
+                                <p class="lead" style="margin: 0px;">Nearest Expiry: <strong>{{alert.kit.nearest_expiry}}</strong></p>
+                                {%endif%}
+                            </div>
+                        </div>
+                    {%endfor%}
+                    {%endif%}
+                    </div>
+                    <div id="itemwarn" style="display: none;">
+                        {%if itemwarn|length == 0%}
+                        <p>There is nothing here now..</p>
+                        {%else%}
+                        {%for alert in itemwarn%}
+                            <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 900px;padding: 10px;display: flex;justify-content: space-evenly;
+                            align-items: center;margin-bottom: 50px;" class="alertglow" >
+                                {%if alert.itemexpiry.item.image%}
+                                <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                                {%elif alert.kit.image%}
+                                <img src="/static/inventoryresource/{{alert.kit.image}}" style="width: 150px;height: 150px;">
+                                {%else%}
+                                <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                                {%endif%}
+                                <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start; padding-left: 5%;border-left: 1px solid #d3d3d3;
+                                margin-left: -5%;">
+                                    {%if alert.itemexpiry%}
+                                    <p style="font-size: 30px;"><strong>{{alert.itemexpiry.item.name}}</strong></p>
+                                    <p class="lead" style="margin: 0px;">Status: <strong>Expiring</strong></p>
+                                    <p class="lead" style="margin: 0px;">Expiry: <strong>{{alert.itemexpiry.expirydate}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;">Opened Qty: <strong>{{alert.itemexpiry.quantityopen}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;">Unopened Qty: <strong>{{alert.itemexpiry.quantityunopened}}</strong></p>
+                                    {%else%}
+                                    <p style="font-size: 30px;"><strong>Kit {{alert.kit.name}}</strong></p>
+                                    <p class="lead" style="margin: 0px;">Status: <strong>Expiring</strong></p>
+                                    <p class="lead" style="margin: 0px;">Nearest Expiry: <strong>{{alert.kit.nearest_expiry}}</strong></p>
+                                    {%endif%}
+                                </div>
+                            </div>
+                        {%endfor%}
+                        {%endif%}
+                    </div>
+                </div>
+                <div id="lowqtyalerts" style="display: none;">
+                    <div id="lowqty">
+                    {%if lowqtyalerts|length == 0%}
+                    <p>There is nothing here now..</p>
+                    {%else%}
+                    {%for alert in lowqtyalerts%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 900px;padding: 10px;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;" class="expireglow">
+                            {%if alert.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start; padding-left: 5%;border-left: 1px solid #d3d3d3;
+                            margin-left: -5%;">
+                                <p style="font-size: 20px;margin-bottom: 0px;"><strong>{{alert.category}}</strong></p>
+                                <p style="font-size: 20px;"><strong>{{alert.item.name}}</strong></p>
+                                {%if alert.category == "Low Item Qty (Opened)"%}
+                                <p class="lead" style="margin-bottom: 0px;">Opened Qty: <strong>{{alert.item.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Min Opened Qty: <strong>{{alert.item.min_quantityopen}}</strong></p>
+                                {%elif alert.category == "Low Item Qty (Unopened)"%}
+                                <p class="lead" style="margin-bottom: 0px;">Unopened Qty: <strong>{{alert.item.quantityunopened}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Min Unopened Qty: <strong>{{alert.item.min_quantityunopened}}</strong></p>
+                                {%else%}
+                                <p class="lead" style="margin-bottom: 0px;">Opened Qty: <strong>{{alert.item.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Min Opened Qty: <strong>{{alert.item.min_quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Unopened Qty: <strong>{{alert.item.quantityunopened}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;">Min Unopened Qty: <strong>{{alert.item.min_quantityunopened}}</strong></p>
+                                {%endif%}
+                            </div>
+                        </div>
+                    {%endfor%}
+                    {%endif%}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content" id="mobilecontent" style="display: none;">
+            <div style="display: flex;align-items: center;width: 100%;flex-direction: column;margin-bottom: 100px;">
+                <div style="border:1px solid #d3d3d3;border-radius: 25px;margin-bottom: 50px;padding: 20px;width: 90%;display: flex;justify-content: space-evenly;
+                background-image: linear-gradient(160deg, #e8444499, #c13738);margin-top: 30vw;">
+                    <button type="button" class="btn btn-outline-warning" style="color: #000;background-color: #ffc107;border-color: #ffc107;font-size: 3vw;" onclick="itemexpiry(this)" id="itemexpirybutton">Item Expiry</button>
+                    <button type="button" class="btn btn-outline-warning" style="box-shadow: 2px 3px #fcbe07;font-size: 3vw;" onclick="loanexpiry(this)" id="loanexpirybutton">Loan Expiry</button>
+                    <button type="button" class="btn btn-outline-warning" style="box-shadow: 2px 3px #fcbe07;font-size: 3vw;" onclick="lowqty(this)" id="lowqtybutton">Quantity Alerts</button>
+                </div>
+                <div class="switch-button-mobile">
+                    <input class="switch-button-checkbox" type="checkbox" onclick="changesubcat(this)"></input>
+                    <label class="switch-button-label" for=""><span class="switch-button-label-span" style="color: black;font-size: 4vw;">Alerts</span></label>
+                </div>
+                <div id="loanalerts" style="display: none;">
+                    <div id="loanexpiry">
+                    {%for alert in loanexpiry%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 90%;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;" class="expireglow">
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;text-align: left;padding-left: 2vw;">
+                                <p style="font-size: 4vw;"><strong>{{alert.category}}</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Expiry: <strong>{{alert.loan.loan_end_date}}</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Loaned out by: <strong>{{alert.loan.ordering_account}}</strong></p>
+                                <p class="lead" style="font-size: 3vw;">Loaned to: <strong>{{alert.loan.loanee_name}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Items: 
+                                {%for loancart in alert.loan.loancart.all%}
+                                <p class="lead" style="font-size: 3vw;"><strong>{{loancart.quantityopen|add:loancart.quantityunopened}}x {{loancart.item.item.name}}; Expiry: {{loancart.item.expirydate}}</strong></p>
+                                {%endfor%}
+                                </p>
+                            </div>
+                        </div>
+                    {%endfor%}
+                    </div>
+                    <div id="loanwarn" style="display: none;">
+                        {%for alert in loanwarn%}
+                            <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 90%;display: flex;justify-content: space-evenly;
+                            align-items: center;margin-bottom: 50px;text-align: left;" class="alertglow" >
+                                <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;padding-left: 2vw;">
+                                    <p style="font-size: 4vw;"><strong>{{alert.category}}</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Expiring on: <strong>{{alert.loan.loan_end_date}}</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Loaned out by: <strong>{{alert.loan.ordering_account}}</strong></p>
+                                    <p class="lead" style="font-size: 3vw;">Loaned to: <strong>{{alert.loan.loanee_name}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Items: 
+                                    {%for loancart in alert.loan.loancart.all%}
+                                    <p class="lead" style="font-size: 3vw;"><strong>{{loancart.quantityopen|add:loancart.quantityunopened}}x {{loancart.item.item.name}}; Expiry: {{loancart.item.expirydate}}</strong></p>
+                                    {%endfor%}
+                                    </p>
+                                </div>
+                            </div>
+                        {%endfor%}
+                    </div>
+                </div>
+                <div id="itemalerts">
+                    <div id="itemexpiry">
+                    {%for alert in itemexpiry%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 90%;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;" class="expireglow">
+                            {%if alert.itemexpiry.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                            {%elif alert.kit.image%}
+                            <img src="/static/inventoryresource/{{alert.kit.image}}" style="width: 150px;height: 150px;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;text-align: left;padding-left: 2vw;">
+                                {%if alert.itemexpiry%}
+                                <p style="font-size: 4vw;"><strong>{{alert.itemexpiry.item.name}}</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Status: <strong>Expired</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Expiry: <strong>{{alert.itemexpiry.expirydate}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Opened Qty: <strong>{{alert.itemexpiry.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Unopened Qty: <strong>{{alert.itemexpiry.quantityunopened}}</strong></p>
+                                {%else%}
+                                <p style="font-size: 4vw;"><strong>Kit {{alert.kit.name}}</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Status: <strong>Expired</strong></p>
+                                <p class="lead" style="margin: 0px;font-size: 3vw;">Nearest Expiry: <strong>{{alert.kit.nearest_expiry}}</strong></p>
+                                {%endif%}
+                            </div>
+                        </div>
+                    {%endfor%}
+                    </div>
+                    <div id="itemwarn" style="display: none;">
+                        {%for alert in itemwarn%}
+                            <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 90%;display: flex;justify-content: space-evenly;
+                            align-items: center;margin-bottom: 50px;text-align: left;" class="alertglow" >
+                                {%if alert.itemexpiry.item.image%}
+                                <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                                {%elif alert.kit.image%}
+                                <img src="/static/inventoryresource/{{alert.kit.image}}" style="width: 150px;height: 150px;">
+                                {%else%}
+                                <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                                {%endif%}
+                                <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;">
+                                    {%if alert.itemexpiry%}
+                                    <p style="font-size: 4vw;"><strong>{{alert.itemexpiry.item.name}}</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Status: <strong>Expiring</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Expiry: <strong>{{alert.itemexpiry.expirydate}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Opened Qty: <strong>{{alert.itemexpiry.quantityopen}}</strong></p>
+                                    <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Unopened Qty: <strong>{{alert.itemexpiry.quantityunopened}}</strong></p>
+                                    {%else%}
+                                    <p style="font-size: 4vw;"><strong>Kit {{alert.kit.name}}</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Status: <strong>Expiring</strong></p>
+                                    <p class="lead" style="margin: 0px;font-size: 3vw;">Nearest Expiry: <strong>{{alert.kit.nearest_expiry}}</strong></p>
+                                    {%endif%}
+                                </div>
+                            </div>
+                        {%endfor%}
+                    </div>
+                </div>
+                <div id="lowqtyalerts" style="display: none;">
+                    <div id="lowqty">
+                    {%for alert in lowqtyalerts%}
+                        <div style="border:1px solid #d3d3d3;border-radius: 25px;width: 90%;display: flex;justify-content: space-evenly;
+                        align-items: center;margin-bottom: 50px;text-align: left;" class="expireglow">
+                            {%if alert.item.image%}
+                            <img src="/uploaded/inventoryitemimages/{{alert.itemexpiry.item.image}}" style="width: 150px;height: 150px;">
+                            {%else%}
+                            <img src="/static/inventoryresource/logo.png" style="width: 150px;height: 150px;">
+                            {%endif%}
+                            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;">
+                                <p style="font-size: 4vw;margin-bottom: 0px;"><strong>{{alert.category}}</strong></p>
+                                <p style="font-size: 4vw;"><strong>{{alert.item.name}}</strong></p>
+                                {%if alert.category == "Low Item Qty (Opened)"%}
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Opened Qty: <strong>{{alert.item.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Min Opened Qty: <strong>{{alert.item.min_quantityopen}}</strong></p>
+                                {%elif alert.category == "Low Item Qty (Unopened)"%}
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Unopened Qty: <strong>{{alert.item.quantityunopened}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Min Unopened Qty: <strong>{{alert.item.min_quantityunopened}}</strong></p>
+                                {%else%}
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Opened Qty: <strong>{{alert.item.quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Min Opened Qty: <strong>{{alert.item.min_quantityopen}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Unopened Qty: <strong>{{alert.item.quantityunopened}}</strong></p>
+                                <p class="lead" style="margin-bottom: 0px;font-size: 3vw;">Min Unopened Qty: <strong>{{alert.item.min_quantityunopened}}</strong></p>
+                                {%endif%}
+                            </div>
+                        </div>
+                    {%endfor%}
+                    </div>
+                </div>
+            </div>
+        </div>
+          </div>
+
+        <script>
+            var mobile = false
+            jQuery(document).ready(function($) {
+                $('.search-button').parent().toggleClass('open');
+                let check = false;
+                (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+                if (check){
+                    mobile = true;
+                    document.getElementById('mobilesvg').style.display = "block";
+                    document.getElementById('pcsvg').style.display = "none";
+                    document.getElementById('tohomemobile').style.display="block";
+                    document.getElementById('pccontent').style.display="none";
+                    document.getElementById('pccontent').remove();
+                    document.getElementById('mobilecontent').style.display="block";
+                }
+            });
+            function itemexpiryfirstbutton(){
+                $("html,body").animate({"scrollTop": $(".content").offset().top},10);
+                itemexpiry(document.getElementById('itemexpirybutton'))
+            }
+            function loanexpiryfirstbutton(){
+                $("html,body").animate({"scrollTop": $(".content").offset().top},10);
+                loanexpiry(document.getElementById('loanexpirybutton'))
+            }
+            function lowqtyfirstbutton(){
+                $("html,body").animate({"scrollTop": $(".content").offset().top},10);
+                lowqty(document.getElementById('lowqtybutton'))
+            }
+            function changesubcat(a){
+                if (a.checked){
+                    document.getElementById('loanwarn').style.display = "block";
+                    document.getElementById('loanexpiry').style.display = "none";
+                    document.getElementById('itemwarn').style.display = "block";
+                    document.getElementById('itemexpiry').style.display = "none";
+                } else {
+                    document.getElementById('loanwarn').style.display = "none";
+                    document.getElementById('loanexpiry').style.display = "block";
+                    document.getElementById('itemwarn').style.display = "none";
+                    document.getElementById('itemexpiry').style.display = "block";
+                }
+            }
+            function itemexpiry(s){
+                document.getElementById('itemalerts').style.display="block";
+                document.getElementById('loanalerts').style.display="none";
+                document.getElementById('lowqtyalerts').style.display="none";
+                if (mobile){
+                    document.querySelector('.switch-button-mobile').style.display="block";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;font-size: 3vw;";
+                    document.getElementById("loanexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                    document.getElementById("lowqtybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                } else{
+                    document.querySelector('.switch-button').style.display="block";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;";
+                    document.getElementById("loanexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                    document.getElementById("lowqtybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                }
+            }
+            function loanexpiry(s){
+                document.getElementById('loanalerts').style.display="block";
+                document.getElementById('itemalerts').style.display="none";
+                document.getElementById('lowqtyalerts').style.display="none";
+                if (mobile){
+                    document.querySelector('.switch-button-mobile').style.display="block";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;font-size: 3vw;";
+                    document.getElementById("itemexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                    document.getElementById("lowqtybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                }else{
+                    document.querySelector('.switch-button').style.display="block";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;";
+                    document.getElementById("itemexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                    document.getElementById("lowqtybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                }
+
+            }
+            function lowqty(s){
+                document.getElementById('loanalerts').style.display="none";
+                document.getElementById('itemalerts').style.display="none";
+                document.getElementById('lowqtyalerts').style.display="block";
+                if (mobile){
+                    document.querySelector('.switch-button-mobile').style.display="none";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;font-size: 3vw;";
+                    document.getElementById("itemexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                    document.getElementById("loanexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;font-size: 3vw;";
+                }else{
+                    document.querySelector('.switch-button').style.display="none";
+                    s.style.cssText = "color: #000;background-color: #ffc107;border-color: #ffc107;";
+                    document.getElementById("itemexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                    document.getElementById("loanexpirybutton").style.cssText = "box-shadow: 2px 3px #fcbe07;";
+                }
+
+            }
+            function tohome(){
+                window.location.href = "{%url 'inventory_index'%}";
+            }
+            // Built by @traf
+            // https://tr.af
+            $(window).scroll(function() {
+                var scroll = $(window).scrollTop();
+                $(".hero").css({
+                    transform: 'translate3d(0, +'+(scroll/100)+'%, 0) scale('+(100 - scroll/100)/100+')'
+                });
+            });
+            function showmenu(){
+                if (mobile){
+                    document.getElementById('menu').style.animationName = "moverightmenu";
+                    document.getElementById('menu').style.animationDuration = '.5s';
+                    document.getElementById('menu').style.animationFillMode = "forward"; 
+                    document.getElementById('menu').style.transform = "translateX(0px)";
+                    document.getElementById('overlay').style.display="block";
+                    document.querySelector('body').style.overflow= "hidden";
+                } else {
+                    window.location.href = "{%url 'inventory_index'%}";
+                }
+            }
+            function closemenu(){
+                document.getElementById('menu').style.animationName = "movebackmenu";
+                document.getElementById('menu').style.animationDuration = '.5s';
+                document.getElementById('menu').style.animationFillMode = "forward"; 
+                document.getElementById('menu').style.transform = "translateX(100vw)";
+                document.getElementById('overlay').style.display="none";
+                document.querySelector('body').style.overflow= "auto";
+            }
+        </script>
+        <script>
+            var orientation = screen.orientation;
+            if (orientation==90){
+                alert("You are advised to view this page in potrait")
+            }
+        </script>
+    </body>

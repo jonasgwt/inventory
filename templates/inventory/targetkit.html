@@ -1,0 +1,90 @@
+{% extends "inventory/template.html" %}
+{% block head_meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock head_meta %}
+
+{% block body %}
+<style>
+    .bg {
+    /* The image used */
+    background-image: url("/static/inventoryresource/A6.jpg");
+
+    /* Full height */
+    height: 100%; 
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    flex-wrap: wrap;
+    }
+</style>
+
+<div class="bg">
+    {%if selected_kit.image is None%}
+        <img src="/static/inventoryresource/logo.png" style="width: 250px; margin-bottom: 20px; animation: fadeinmovedown 1s forwards;">
+    {%else%}
+        <img src="/static/inventoryresource/{{selected_kit.image}}" style="width: 250px; margin-bottom: 20px; animation: fadeinmovedown 1s forwards;">
+    {%endif%}    
+    <h1 class="display-3" style="color: black;animation: fadeinmovedown 1s forwards;">Kit {{selected_kit.name}}</h1>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Status: {{selected_kit.status}}</p>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Lasr Used By: {{selected_kit.transactions.last.ordering_account.username}}</p>
+    <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;margin-bottom: 50px;">Nearest Expiry: {{selected_kit.nearest_expiry}}</p>
+    {%if selected_kit.status == "In Cart"%}
+        <div>
+            <p class="lead">In Active Cart</p>
+        </div>
+    {%elif selected_kit.status == "Unstocked"%}
+        <a href="{% url 'kits_restock' selected_kit.name%}">
+            <button type="button" class="btn btn-outline-success"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Stock</button>
+        </a>
+    {%elif selected_kit.status == "In Use" and selected_kit.kitloancartitem.last.ordering_account != request.user%}
+        <div>
+            <p class="lead" style="color: black; font-size: 25px; animation: fadeinmovedown 1s forwards;">Kit Loaned out by {{selected_kit.kitloancartitem.last.ordering_account.username}}</p>
+        </div>
+        {%if selected_kit.kitloancartitem.last.ordering_account == request.user%}
+        <a href="{% url 'kits_return' selected_kit.name%}">
+            <button type="button" class="btn btn-outline-success"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Return</button>
+        </a>
+        {%endif%}
+    {%elif cart_type == "withdraw"%}
+        {%if selected_kit.status == "In Use"%}
+            <div>
+                <p class="lead">No Action</p>
+            </div>
+        {%else%}
+            <a href="{% url 'kits_withdraw' selected_kit.name %}">
+                <button type="button" class="btn btn-outline-danger"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Withdraw</button>
+            </a>
+        {%endif%}
+    {%elif cart_type == "deposit"%}
+        {%if selected_kit.status == "Available"%}
+            <div>
+                <p class="lead">No Action</p>
+            </div>
+        {%else%}
+            <a href="{% url 'kits_return' selected_kit.name%}">
+                <button type="button" class="btn btn-outline-success"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Return</button>
+            </a>
+        {%endif%}
+    {%elif cart_type == "empty"%}
+        {%if selected_kit.status == "Available"%}
+            <a href="{% url 'kits_withdraw' selected_kit.name %}">
+                <button type="button" class="btn btn-outline-danger"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Withdraw</button>
+            </a>
+        {%elif selected_kit.status == "In Use"%}
+            <a href="{% url 'kits_return' selected_kit.name%}">
+                <button type="button" class="btn btn-outline-success"style="margin-bottom: 20px; width: 220px;height:51px;font-size: 25px;animation: fadeinexpandbutton 1s forwards;overflow: hidden;">Return</button>
+            </a>
+        {%endif%}
+    {%endif%}
+</div>
+
+
+
+
+{% endblock %}

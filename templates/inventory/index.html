@@ -1,0 +1,137 @@
+{% extends "inventory/template.html" %}
+
+{% block body %}
+<style>
+    .itemcontainer{
+        display: flex;
+        border-radius: 25px;
+        border: 2px solid #d3d3d3;
+        padding: 20px;
+        margin: auto;
+        margin-top: 50px;
+        width: 950px;
+        align-items: center;
+    }
+    .lead{
+        margin: 1px;
+        font-size: 15px;
+    }
+    .rightsettings{
+        position: absolute;
+        right: 0px;
+        margin-right: 50px;
+        margin-top: 50px;
+        border: 2px solid #d3d3d3;
+        border-radius: 25px;
+        padding: 30px;
+    }
+    @media screen and (max-width: 1650px) {
+        .rightsettings{
+            display: none;
+        }
+    }
+    .searchsettingscheckbox{
+        margin-bottom: 10%;
+    }
+    .btn-close:focus{
+        outline: none;
+        box-shadow: none;
+    }
+    @media screen and (min-width: 1650px) {
+        #mobilewarning{
+            display: none;
+        }
+        #mobilesearch{
+            display: none;
+        }
+    }
+    .searchsettingsinput{
+        margin-bottom: 10%;
+    }
+</style>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{%url 'main_index'%}" style="display: flex;">
+            <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+            <p class="lead" style="margin: auto; font-size: 20px;">Inventory Management System</p>
+        </a>
+        <div style="display: flex; align-items: center;">
+            <div id="mobilesearch">
+                <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Search by name" style="width: 200px;margin-right: 25px;border-radius: 25px;background-color: #2b2b2b;height: 30px;color: #d3d3d3;">
+                    <datalist id="datalistOptions">
+                        {%for item in items%}
+                            <option value="{{item.name}}"></option>
+                        {%endfor%}
+                    </datalist>
+            </div>
+            <span class="navbar-text">
+                Logged in as {{user.username}}
+            </span>
+        </div>
+    </div>
+</nav>
+<div class="alert alert-dark alert-dismissible fade show" role="alert" id="mobilewarning">
+    <strong>Warning!</strong> Full functionality is not enabled on mobile or a small screen
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div class="rightsettings">
+    <h2 style="margin-bottom: 10%;">Search Settings</h2>
+    <p>Search by type</p>
+    <div class="searchsettingscheckbox">
+        {%for typechoice in typechoices%}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="{{typechoice}}">
+                <label class="form-check-label" for="{{typechoice}}">
+                    <p class="lead">{{typechoice}}</p>
+                </label>
+            </div>
+        {%endfor%}
+    </div>
+    <div class="searchsettingsinput">
+        <label for="exampleDataList" class="form-label">Search by name</label>
+        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+            <datalist id="datalistOptions">
+                {%for item in items%}
+                    <option value="{{item.name}}"></option>
+                {%endfor%}
+            </datalist>
+    </div>
+    {%if user.username == "Jonas" or user.username == "sjbadmin" or user.username == "eriol"%}
+        <div>
+            <p>Advanced Options</p>
+            <button type="button" class="btn btn-secondary">Show Order Logs</button>
+        </div>
+    {%endif%}
+
+</div>
+
+{%for item in items%}
+    <div class="itemcontainer">
+        <div style="width: 200px; height: 200px;margin-left: 50px;">
+            {%if item.image is None%}
+                <img src="/static/inventoryresource/logo.png" style="width: auto; height: 200px;">
+            {%else%}
+                <img src="/static/inventoryresource/{{item.image}}" style="width: auto; height: 200px;">
+            {%endif%}
+        </div>
+        <div style="margin-left: 8%;padding-right: 8%;width: 100%; border-right: 1px solid #d3d3d3;">
+            <h2 style="font-size: 32px;">{{item.name}}</h2>
+            <p class="lead" style="font-size: 20px;">Current Stocked Quantity: <strong>{{item.quantityopen|add:item.quantityunopened}}</strong></p>
+            <p class="lead" style="font-size: 20px;">Quantity(Open/Used): <strong>{{item.quantityopen}}</strong></p>
+            <p class="lead" style="font-size: 20px;">Quantity(Unused): <strong>{{item.quantityunopened}}</strong></p> 
+            <p class="lead" style="font-size: 20px;">Type: <strong>{{item.unit}}</strong></p> 
+            {%if item.expirydate is None%}
+                <p class="lead" style="font-size: 20px;">Expiry Date: <strong>-</strong></p>
+            {%else%}
+                <p class="lead" style="font-size: 20px;">Expiry Date: <strong>{{item.expirydate}}</strong></p>
+            {%endif%}
+        </div>
+        <div style="width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+                <button type="button" class="btn btn-danger" style="margin-bottom: 20%;">Withdraw</button>
+                <button type="button" class="btn btn-success" style="width: 94px;">Deposit</button>
+        </div>
+    </div>
+{%endfor%}
+
+
+{% endblock %}

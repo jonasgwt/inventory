@@ -1,0 +1,133 @@
+{% extends "inventory/template.html" %}
+{% block body %}
+<style>
+    .iteminfocontainer{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items:center;
+        height: 100%;
+    }
+    .border{
+        border:  1px solid #d3d3d3!important;
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        border-radius: 50px;
+        background-color: #75151e!important;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+    .borderdeposit{
+        border:  1px solid #d3d3d3!important;
+        padding: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        border-radius: 50px;
+        background-color: #198754!important;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+    .submitbutton {
+        border: 1px solid #d3d3d3;
+        border-radius: 50px;
+        margin-top: 20px;
+        padding: 10px;
+        text-align: center;
+        padding-left: 65px;
+        padding-right: 65px;
+        background-color: #d3d3d3;
+    }
+    .submitbutton:hover{
+        background-color: #919191;
+        border: 1px solid #919191;
+    }
+</style>
+<div class="iteminfocontainer">
+    {%if type == "Withdraw"%}
+    <div class="border">
+    {%else%}
+    <div class="borderdeposit">
+    {%endif%}
+        <!-- Target Image -->
+        {%if target.image is not None%}
+            <img src="/static/inventoryresource/{{target.image}}"style="width: auto; height: 200px;">
+        {%else%}
+            <img src="/static/inventoryresource/logo.png"style="width: auto; height: 200px;">
+        {%endif%}
+        <!-- Target Info -->
+        <h1 class="display-3" style="max-width: 800px;word-wrap: normal;text-align: center;margin-bottom: 10px;">{{target.name}}</h1>
+        <p class="lead" style="font-size: 25px;">Total Quantity: {{target.quantityopen|add:target.quantityunopened}} (before)</p>
+        <p class="lead" style="font-size: 25px;">Quantity Opened: {{target.quantityopen}} (before)</p>
+        <p class="lead" style="font-size: 25px;">Quantity Unopened: {{target.quantityunopened}} (before)</p>
+        <p class="lead" style="font-size: 25px;">Type: {{target.unit}}</p>
+        <p class="lead" style="font-size: 25px;">Expiry Date: {{target.expirydate}}</p>
+        <p class="lead" style="font-size: 35px; margin-top: 50px;">Your {{type}} Order</p>
+        <!-- Target Form -->
+        <form action="{%url 'itemwithdraw' target%}" method="POST" style="display: flex;flex-direction: column;align-items: center;">
+        <!-- User Name -->
+        <div class="form-floating mb-3" style="margin-top: 20px;">
+            <input type="text" class="form-control" id="floatingInput" placeholder="user" style="width: 300px;" required>
+            <label for="floatingInput" style="color: #212529;">Your Name</label>
+        </div>
+        <!-- input for qtyopen -->
+        {%if target.quantityopen != 0%}
+            <div class="form-floating mb-3" style="margin-top: 20px;">
+                <input type="number" class="form-control" id="floatingInput" value=0 min=0 max="{{target.quantityopen}}" placeholder="0" style="width: 300px;" required>
+                <label for="floatingInput" style="color: #212529;">{{type}} from Opened</label>
+            </div>
+        {%endif%}
+        <!-- input for qtyunopened -->
+        {%if target.quantityunopened != 0%}
+            <div class="form-floating mb-3" style="margin-top: 20px;">
+                <input type="number" class="form-control" id="floatingInput" value=0 min=0 max="{{target.quantityunopened}}" placeholder="0" style="width: 300px;" required>
+                <label for="floatingInput" style="color: #212529;">{{type}} from Unopened</label>
+            </div>
+        {%endif%}
+        <!-- input for reason -->
+        {%if type == "Deposit"%}
+            <div class="form-floating" style="margin-top: 20px;">
+                <select class="form-select" id="floatingSelect" aria-label="Floating label select example" style="width: 300px;height: 65px;" required onchange="checktoopenothers(this)">
+                <option value="Replenishment of Supplies" selected>Replenishment of Supplies</option>>
+                <option value="Others">Others</option>
+                </select>
+                <label for="floatingSelect" style="color: #212529;">Purpose of {{type}}</label>
+            </div>
+        {%else%}
+            <div class="form-floating" style="margin-top: 20px;">
+                <select class="form-select" id="floatingSelect" aria-label="Floating label select example" style="width: 300px;height: 65px;" required onchange="checktoopenothers(this)">
+                <option value="Restocking of Pouches" selected>Restocking of Pouches</option>
+                <option value="Unserviceable" >Unserviceable</option>
+                <option value="Others">Others</option>
+                </select>
+                <label for="floatingSelect" style="color: #212529;">Purpose of {{type}}</label>
+            </div>
+        {%endif%}
+        <!-- input for other reasons -->
+        <div class="form-floating" id="othereasons" style="margin-top: 20px;display: none;">
+            <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px; width: 300px;"></textarea>
+            <label for="floatingTextarea2" style="color: #212529;">Purpose</label>
+        </div>
+    </div>
+    <!-- submit button -->
+    <input type="hidden" name="type" value="{{type}}">
+    <button class="submitbutton" type="submit">Submit</button>
+    </form>
+</div>
+<script>
+    function checktoopenothers(select) {
+        if (select.value=="Others"){
+            document.querySelector('#othereasons').style.display = "initial";
+        } else {
+            document.querySelector('#floatingTextarea2').value = ""
+            document.querySelector('#othereasons').style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends "inventory/template.html" %}
+
+{% block body %}
+<style>
+    .itemcontainer{
+        display: flex;
+        border-radius: 25px;
+        border: 2px solid #d3d3d3;
+        padding: 20px;
+        margin: auto;
+        margin-top: 50px;
+        width: 950px;
+        align-items: center;
+    }
+    .lead{
+        margin: 1px;
+        font-size: 15px;
+    }
+    .rightsettings{
+        position: absolute;
+        right: 0px;
+        margin-right: 50px;
+        border: 2px solid #d3d3d3;
+        border-radius: 25px;
+        padding: 30px;
+    }
+    @media screen and (max-width: 1650px) {
+        .rightsettings{
+            display: none;
+        }
+    }
+    .searchsettingscheckbox{
+        margin-bottom: 10%;
+        display: flex;
+        flex-direction: column;
+    }
+    .btn-close:focus{
+        outline: none;
+        box-shadow: none;
+    }
+    @media screen and (min-width: 1650px) {
+        #mobilesearch{
+            display: none;
+        }
+        #topsearchnavibar{
+            display: none;
+        }
+    }
+    .searchsettingsinput{
+        margin-bottom: 10%;
+    }
+    .buttonselected {
+        color: #fff;
+        background-color: #198754;
+        border-color: #198754;
+    }
+    .buttonselectedgrey{
+        color: #fff;
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
+    .pagination > li > a
+    {
+        background-color: #121212;
+        color: white;
+    }
+
+    .pagination > li > a:focus,
+    .pagination > li > a:hover,
+    .pagination > li > span:focus,
+    .pagination > li > span:hover
+    {
+        color: #5a5a5a;
+        background-color: #121212;
+        border-color: #ddd;
+    }
+</style>
+
+<!-- Top Menu bar -->
+<nav class="navbar navbar-dark bg-dark" style="position: fixed;top: 0;width: 100%;flex-wrap: nowrap;">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand" href="{%url 'inventory_index'%}" style="display: flex;">
+            <img src="/static/inventoryresource/logo.png" alt="sjablogo"  height="30" class="d-inline-block align-top" style="margin-right: 5px;">
+            <p class="lead" style="margin: auto; font-size: 20px;">Inventory Management System</p>
+        </a>
+        <!-- Mobile Search -->
+        <div style="display: flex; align-items: center;">
+            <div id="mobilesearch">
+                <form action="{%url 'firstaid_list'%}" method="POST" style="display: flex;margin-right: 20px;justify-content: flex-end;">
+                    {%csrf_token%}
+                    <input class="form-control" type="search" list="datalistOptions" id="mobileDataList" name="searchthis" placeholder="Search by name" style="width: 250px;border-radius: 25px;background-color: #2b2b2b;height: 30px;color: #d3d3d3;padding-right: 20%;">
+                    <datalist id="datalistOptions">
+                        {%for item in items%}
+                            <option value="{{item.name}}"></option>
+                        {%endfor%}
+                    </datalist>
+                    <button type="submit" style="background: none;border: none;color: white;position: absolute;margin-right: 10px;border-left: 1px solid white;height: 30px;display: flex;align-items: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            <!-- Logged in user -->
+            <span class="navbar-text" style="margin-right: 20px;text-overflow: clip;white-space: nowrap;">
+                Logged in as {{user.username}}
+            </span>
+            <!-- Cart -->
+            <a href="{%url 'activecart'%}" style="display: flex;align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16" style="margin-right: 20px;color:rgb(255 255 255 / 55%);">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+            </a>
+            <!-- Log out -->
+            <a href="{%url 'logout_view'%}" style="display: flex;align-items: center;">
+                <button type="button" class="btn btn-outline-secondary" style="color: rgb(255 255 255 / 55%);border-radius: 25px; margin-right: 5px;height: 30px;display: flex;align-items: center;">Logout</button>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- Right fixed settings for big screens -->
+<div class="rightsettings" style="position: fixed;">
+    <h2 style="margin-bottom: 10%;">Search Settings</h2>
+    <p>Search by type</p>
+    <div class="searchsettingscheckbox">
+        {%if itemtype == "all" or itemtype is None%}
+            <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;margin-top: 10px;" value="all" onclick="changeshownitems(this)">Show All</button>
+        {%else%}
+            <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;margin-top: 10px;" value="all" onclick="changeshownitems(this)">Show All</button>
+        {%endif%}
+        {%for typechoice in typechoices%}
+            {%if itemtype == typechoice%}
+                <button type="button" class="btn btn-outline-secondary buttonselectedgrey" style="border-radius: 25px;margin-bottom: 10px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+            {%else%}
+                <button type="button" class="btn btn-outline-secondary" style="border-radius: 25px;margin-bottom: 10px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+            {%endif%}
+        {%endfor%}
+        <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;" value="cart" onclick="changeshownitems(this)">View Cart</button>
+    </div>
+    <div class="searchsettingsinput">
+        <form action="{%url 'firstaid_list'%}" method="POST">
+            {%csrf_token%}
+            <label for="pcDataList" class="form-label">Search by name</label>
+            <input class="form-control" list="datalistOptions" name="searchthis" id="pcDataList" placeholder="Search by name">
+                <datalist id="datalistOptions">
+                    {%for item in items%}
+                        <option value="{{item.name}}"></option>
+                    {%endfor%}
+                </datalist>
+        </form>
+    </div>
+    {%if user.username == "Jonas" or user.username == "sjbadmin" or user.username == "eriol"%}
+        <div>
+            <p>Advanced Options</p>
+            <a href="{%url 'orderlogs'%}">
+                <button type="button" class="btn btn-secondary">Show Order Logs</button>
+            </a>
+        </div>
+    {%endif%}
+</div>
+
+<!-- Top settings for small screens -->
+<form class="itemcontainer" action="{%url 'firstaid_list'%}" method="POST" id="topsearchnavibar" style="justify-content: space-around;margin-top: 10%;">
+    {%csrf_token%}
+    {%if itemtype == "all" or itemtype is None%}
+        <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="all" onclick="changeshownitems(this)">Show All</button>
+    {%else%}
+        <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="all" onclick="changeshownitems(this)">Show All</button>
+    {%endif%}
+    {%for typechoice in typechoices%}
+        {%if itemtype == typechoice%}
+            <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+        {%else%}
+            <button type="button" class="btn btn-outline-success" style="border-radius: 25px;" value="{{typechoice}}" onclick="changeshownitems(this)">{{typechoice}}</button>
+        {%endif%}
+    {%endfor%}
+    <button type="button" class="btn btn-outline-warning" style="border-radius: 25px;" value="cart" onclick="changeshownitems(this)">View Cart</button>
+    <input type="hidden" style="display: none;" name="itemtype" id="itemtype" value="">
+</form>
+
+<!-- Item Containers -->
+<div style="margin-top: 5%;">
+    {%for item in items%}
+        <div class="itemcontainer">
+            <div style="width: 200px; height: 200px;margin-left: 50px;">
+                {%if item.image is None%}
+                    <img src="/static/inventoryresource/logo.png" style="width: auto; height: 200px;">
+                {%else%}
+                    <img src="/static/inventoryresource/{{item.image}}" style="width: auto; height: 200px;">
+                {%endif%}
+            </div>
+            <div style="margin-left: 8%;padding-right: 8%;width: 100%; border-right: 1px solid #d3d3d3;">
+                <h2 style="font-size: 32px;">{{item.name}}</h2>
+                <p class="lead" style="font-size: 20px;">Current Stocked Quantity: <strong>{{item.total_quantityopen|add:item.total_quantityunopened}}</strong></p>
+                <p class="lead" style="font-size: 20px;">Quantity(Open/Used): <strong>{{item.total_quantityopen}}</strong></p>
+                <p class="lead" style="font-size: 20px;">Quantity(Unused): <strong>{{item.total_quantityunopened}}</strong></p> 
+                <p class="lead" style="font-size: 20px;">Type: <strong>{{item.unit}}</strong></p> 
+                {%if item.expirydate is None%}
+                    <p class="lead" style="font-size: 20px;">Expiry Date: <strong>-</strong></p>
+                {%else%}
+                    <p class="lead" style="font-size: 20px;">Expiry Date: <strong>{{item.expirydates.all}}</strong></p>
+                {%endif%}
+            </div>
+            <div style="width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+                {%if cart_type == "withdraw"%}
+                <a href="{% url 'itemwithdraw' itemgrp item%}">
+                    <button type="button" class="btn btn-danger">Withdraw</button>
+                </a>
+                {%elif cart_type == "deposit"%}
+                <a href="{% url 'itemdeposit' itemgrp item%}">
+                    <button type="button" class="btn btn-success" style="width: 94px;">Deposit</button>
+                </a>
+                {%elif cart_type == "empty"%}
+                <a href="{% url 'itemwithdraw' itemgrp item%}">
+                    <button type="button" class="btn btn-danger" style="margin-bottom: 20%;">Withdraw</button>
+                </a>
+                <a href="{% url 'itemdeposit' itemgrp item%}">
+                    <button type="button" class="btn btn-success" style="width: 94px;">Deposit</button>
+                </a>
+                {%endif%}
+            </div>
+            </div>
+    {%endfor%}
+</div>
+
+<!-- Pagination -->
+{% if items.has_other_pages %}
+    <ul class="pagination justify-content-center" style="margin-top: 50px; padding-bottom: 100px;">
+        {% if items.has_previous %}
+        <li class="page-item" ><a class="page-link" href="?page={{ items.previous_page_number }}">Previous</a></li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" style="background-color: #121212;color: gray;">Previous</span>
+        </li>
+        {% endif %}
+        {% for i in page_range %}
+            {% if items.number == i %}
+                <li class="page-item active"><span class="page-link" style="border-style: solid; border-color: #ddd; border-width: 1px; background-color: #28a745;">{{ i }}<span class="sr-only">(current)</span></span></li>
+            {% else %}
+                <li class="page-item" ><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        {% if items.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ items.next_page_number }}">Next</a></li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" style="background-color: #121212;color: gray;">Next</span>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}
+
+
+
+<script>
+    function changeshownitems(button) {
+        document.querySelector('#itemtype').value = button.value
+        document.querySelector('#topsearchnavibar').submit()
+    }
+</script>
+
+{% endblock %}
