@@ -1,4 +1,4 @@
-# ![alt text](https://playground.nhhs-sjb.org/static/inventoryresource/logo.png)Inventory Management System
+# <img src="https://playground.nhhs-sjb.org/static/inventoryresource/logo.png" alt="drawing" width="200"/>Inventory Management System
 
 ## Description
 
