@@ -218,7 +218,7 @@ def report():
     for expired in itemexpire:
         messagecart=""
         message="\U000026A0<u><b>One set of "+ str(expired.item.name)+ " has Expired!</b></u>\U000026A0\n\n" + "Type: "+str(expired.item.type)+"\nQuantity Opened: "+str(expired.quantityopen)+"\nQuantity Unopened: "+str(expired.quantityunopened)+"\n\n<code>Expired on " +str(expired.expirydate)+"</code>"
-        telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/uploaded/inventoryitemimages/"+expired.image)
+        telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/uploaded/inventoryitemimages/"+expired.image)
     #send message for expiring items
     for expiring in itemwarn:
         messagecart=""
@@ -226,12 +226,12 @@ def report():
         if expiring.image == None:
             telegram_bot_sendpmphoto(message, "Jonas", False)
         else:
-            telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/uploaded/inventoryitemimages/"+expiring.image)
+            telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/uploaded/inventoryitemimages/"+expiring.image)
     #send message for expired kits
     for expired in kitexpire:
         messagecart=""
         message="\U000026A0<u><b>"+ str(expired.name)+ " has Expired!</b></u>\U000026A0\n\n" + "Status: "+str(expired.status)+"\n\n<code>Expired on " +str(expired.nearest_expiry)+"</code>"
-        telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/static/inventoryresource/"+expired.image)
+        telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/static/inventoryresource/"+expired.image)
     #send message for expiring kits
     for expiring in kitwarn:
         messagecart=""
@@ -239,26 +239,26 @@ def report():
         if expiring.image == None:
             telegram_bot_sendpmphoto(message, "Jonas", False)
         else:
-            telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/static/inventoryresource/"+expiring.image)
+            telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/static/inventoryresource/"+expiring.image)
     #send message for low qty opened
     for item in itemqtyopened:
         message="\U0001F4C9<u><b>Quantity of "+ str(item.name)+ " is Low!</b></u>\U0001F4C9\n\n" + "Type: "+str(item.type)+"\nQuantity Opened: "+str(item.total_quantityopen)+"\nMin Quantity Opened: "+str(item.min_quantityopen)
         if item.image:
-            telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
+            telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
         else:
             telegram_bot_sendpmphoto(message, "Jonas", False)
     #send message for low qty unopened
     for item in itemqtyunopened:
         message="\U0001F4C9<u><b>Quantity of "+ str(item.name)+ " is Low!</b></u>\U0001F4C9\n\n" + "Type: "+str(item.type)+"\nQuantity Unopened: "+str(item.total_quantityunopened)+"\nMin Quantity Unopened: "+str(item.min_quantityunopened)
         if item.image:
-            telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
+            telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
         else:
             telegram_bot_sendpmphoto(message, "Jonas", False)
     #send message for low qty unopened and opened
     for item in itemqty:
         message="\U0001F4C9<u><b>Quantity of "+ str(item.name)+ " is Low!</b></u>\U0001F4C9\n\n" + "Type: "+str(item.type)+"\nQuantity Opened: "+str(item.total_quantityopen)+"\nMin Quantity Opened: "+str(item.min_quantityopen)+"\nQuantity Unopened: "+str(item.total_quantityunopened)+"\nMin Quantity Unopened: "+str(item.min_quantityunopened)
         if item.image:
-            telegram_bot_sendpmphoto(message, "Jonas", "https://inventory.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
+            telegram_bot_sendpmphoto(message, "Jonas", "https://playground.nhhs-sjb.org/uploaded/inventoryitemimages/"+item.image)
         else:
             telegram_bot_sendpmphoto(message, "Jonas", False)
 
@@ -958,7 +958,7 @@ def activecart(request):
                     #check and report qty
                     target = cartitem.item
                     sendmessageforlowqty(target)
-                messagetele = "\U00002796<u><b>Loan Request Processed</b></u>\U00002796\n\n<b>Loan No. "+ str(newloan.id)+"</b>\n\n"+str(messagecart)+"\n<code>For "+str(newloan.loanee_name)+" until "+ str(newloan.loan_end_date)+" authenticated by "+str(newloan.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/loan/"+str(newloan.id)+"' >View Receipt Here</a>"
+                messagetele = "\U00002796<u><b>Loan Request Processed</b></u>\U00002796\n\n<b>Loan No. "+ str(newloan.id)+"</b>\n\n"+str(messagecart)+"\n<code>For "+str(newloan.loanee_name)+" until "+ str(newloan.loan_end_date)+" authenticated by "+str(newloan.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/loan/"+str(newloan.id)+"' >View Receipt Here</a>"
                 telegram_bot_sendtext(messagetele)
                 #Generate Receipt
                 return redirect("receipt", type = "loan", ordernumber = newloan.id)
@@ -976,7 +976,7 @@ def activecart(request):
                         messagecart += " •  "+str(quantity)+ " " + cartitem.item.item.name + "; Expiry: " + str(cartitem.item.expirydate)+"\n"
                 else:
                     messagecart = " •  "+"Loan Closed\n"
-                messagetele = "\U00002795<u><b>Loan Return Request Processed</b></u>\U00002795\n\n<b>Order No. "+ str(loanobject.id)+"</b>\n\n<i>Returned:</i>\n"+str(returnedmessagecart)+"\n<i>Outstanding Items</i>\n"+str(messagecart)+"\n<code>For "+str(loanobject.loanee_name)+" until "+ str(loanobject.loan_end_date)+" authenticated by "+str(loanobject.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/loan/"+str(loanobject.id)+"' >View Receipt Here</a>"
+                messagetele = "\U00002795<u><b>Loan Return Request Processed</b></u>\U00002795\n\n<b>Order No. "+ str(loanobject.id)+"</b>\n\n<i>Returned:</i>\n"+str(returnedmessagecart)+"\n<i>Outstanding Items</i>\n"+str(messagecart)+"\n<code>For "+str(loanobject.loanee_name)+" until "+ str(loanobject.loan_end_date)+" authenticated by "+str(loanobject.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/loan/"+str(loanobject.id)+"' >View Receipt Here</a>"
                 telegram_bot_sendtext(messagetele)
                 #Generate Receipt
                 return redirect("receipt", type = "loan", ordernumber = targetloantoreturn)
@@ -991,11 +991,11 @@ def activecart(request):
                     sendmessageforlowqty(target)
                 if neworder.ordertype =="Withdraw":
                     if neworder.for_kit is None:
-                        messagetele = "\U00002796<u><b>Withdrawal Request Processed</b></u>\U00002796\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
+                        messagetele = "\U00002796<u><b>Withdrawal Request Processed</b></u>\U00002796\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
                     else:
-                        messagetele = "\U00002796<u><b>Withdrawal Request Processed</b></u>\U00002796\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+" for Kit "+str(neworder.for_kit.name)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
+                        messagetele = "\U00002796<u><b>Withdrawal Request Processed</b></u>\U00002796\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+" for Kit "+str(neworder.for_kit.name)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
                 else:
-                    messagetele = "\U00002795<u><b>Deposit Request Processed</b></u>\U00002795\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
+                    messagetele = "\U00002795<u><b>Deposit Request Processed</b></u>\U00002795\n\n<b>Order No. "+ str(neworder.id)+"</b>\n"+"<i>"+str(neworder.reason)+"</i>\n\n"+str(messagecart)+"\n<code>Authenticated by "+str(neworder.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
                 telegram_bot_sendtext(messagetele)
                 #Generate Receipt
                 return redirect("receipt", type = "order", ordernumber = neworder.id)
@@ -1108,7 +1108,7 @@ def orderlogs(request):
                     loanitem.item.save()
                 selectedloan.loan_active = False
                 selectedloan.save()
-                messagetele = "\U00002796<u><b>Loan Expanded Request Processed</b></u>\U00002796\n\n<b>Loan No. "+ str(selectedloan.id)+"</b>\n\n"+str(messagecart)+"\n<code>For "+str(selectedloan.loanee_name)+" authenticated by "+str(selectedloan.ordering_account.username)+"</code>\n\n <a href='https://inventory.nhhs-sjb.org/home/receipt/loan/"+str(selectedloan.id)+"' >View Receipt Here</a>"
+                messagetele = "\U00002796<u><b>Loan Expanded Request Processed</b></u>\U00002796\n\n<b>Loan No. "+ str(selectedloan.id)+"</b>\n\n"+str(messagecart)+"\n<code>For "+str(selectedloan.loanee_name)+" authenticated by "+str(selectedloan.ordering_account.username)+"</code>\n\n <a href='https://playground.nhhs-sjb.org/home/receipt/loan/"+str(selectedloan.id)+"' >View Receipt Here</a>"
                 telegram_bot_sendtext(messagetele)
                 return render(request, "inventory/orderlogs.html", {
                     "allorders" : all_orders,
@@ -1818,7 +1818,7 @@ def kits_restock(request, item):
                     kitstatusmessage="\n<i>Kit is now Available</i>\n"
                 else:
                     kitstatusmessage="\n<i>Kit is not fully stocked</i>\n"
-                messagetele="\U0001F504<u><b>Kit "+item_object.name+" Restocked</b></u>\U0001F504\n"+kitstatusmessage+"\n"+messagecart+"\n\n<code>Kit Transaction No.: "+str(new_transaction.id)+"\nOrder Transaction No.: "+str(neworder.id)+"\nAuthorised by: "+ request.user.username+"</code>\n\n<a href='https://inventory.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
+                messagetele="\U0001F504<u><b>Kit "+item_object.name+" Restocked</b></u>\U0001F504\n"+kitstatusmessage+"\n"+messagecart+"\n\n<code>Kit Transaction No.: "+str(new_transaction.id)+"\nOrder Transaction No.: "+str(neworder.id)+"\nAuthorised by: "+ request.user.username+"</code>\n\n<a href='https://playground.nhhs-sjb.org/home/receipt/order/"+str(neworder.id)+"' >View Receipt Here</a>"
                 telegram_bot_sendtext(messagetele)
                 return redirect('kits_list')
             else:
