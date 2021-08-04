@@ -989,14 +989,26 @@
             '{%endif%}'
         } if (document.querySelector('#floatingTextareadeposit') != null ){
             purposedepositothers = document.querySelector('#floatingTextareadeposit').value;
+            if (purposedepositothers === "" && document.querySelector('#floatingTextareadeposit').parentNode.style.display != "None"){
+                return alert("Fill up all fields!")
+            }
         } if (document.querySelector('#floatingTextareawithdraw') != null ){
             purposewithdrawothers = document.querySelector('#floatingTextareawithdraw').value;
+            if (purposewithdrawothers === "" && document.querySelector('#floatingTextareawithdraw').parentNode.style.display != "None"){
+                return alert("Fill up all fields!")
+            }
         } if (document.querySelector('#kit_to_stock_field') != null ){
             kit_to_stock = document.querySelector('#kit_to_stock_field').value;
         } if (document.querySelector('#inputloaneename') != null ){
             loaneename = document.querySelector('#inputloaneename').value;
+            if (loaneename === "" && document.querySelector('#inputloaneename').parentNode.style.display != "None"){
+                return alert("Fill up all fields!")
+            }
         } if (document.querySelector('#inputreturndate') != null ){
             loanenddate = document.querySelector('#inputreturndate').value;
+            if (loanenddate === "" && document.querySelector('#inputreturndate').parentNode.style.display != "None"){
+                return alert("Fill up all fields!")
+            }
         } if (document.querySelector('#targetloantoreturn') != null ){
             targetloantoreturn = document.querySelector('#targetloantoreturn').value;
         }  if (document.querySelector('#discrepenciesselection') != null ){
@@ -1131,7 +1143,6 @@
         });
     }
     function clearcart(){
-        loading()
         $.ajax({
             beforeSend: function (request) {
                 if (!confirm('Are you sure you want to remove ALL items from cart?\nTHIS ACTION CANNOT BE REVERSED')){
