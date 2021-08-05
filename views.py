@@ -41,16 +41,18 @@ from .secret import *
 
 # Create your views here.
 
-
+#uncomment to enable telegram updates
 """ def telegram_bot_sendtext(bot_message):
     bot_chatID = group
     send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=HTML&text=' + bot_message
     response = requests.get(send_text)
     return response.json() """
 
+#delete to enable telegram updates
 def telegram_bot_sendtext(bot_message):
     pass
 
+#uncomment to enable telegram updates
 """ def telegram_bot_sendpmphoto(bot_message, person, photo):
     
     if person == "eriol":
@@ -68,6 +70,7 @@ def telegram_bot_sendtext(bot_message):
         response = requests.get(send_text)
         return response.json() """
 
+#delete to enable telegram updates
 def telegram_bot_sendpmphoto(bot_message, person, photo):
     pass
 
