@@ -39,7 +39,35 @@ import csv
 import xlwt
 from .secret import *
 
+
 # Create your views here.
+
+#expiremental ordering
+def orderfaitems():
+    all_inventory = list(Item.objects.all())
+    all_attractability=[]
+    now = datetime.datetime.now().time()
+    #adjust weight here (higher weight means more emphasis on time sorting)
+    weight = 0.25
+    for i in all_inventory:
+        i_expiry_list=[]
+        #median time, popularity
+        result=[]
+        for x in cart.objects.filter(item__item=i).values_list('time', flat=True).order_by('time__hour', 'time__minute'):
+            i_expiry_list.append((x.time())) 
+        if len(i_expiry_list)>0:
+            median = sorted(i_expiry_list)[round(len(i_expiry_list)/2)]
+            i.avg_transact_time = str(median)
+            i.save()
+            diff = abs(datetime.datetime.combine(datetime.datetime.today(), now) - datetime.datetime.combine(datetime.datetime.today(), median)).seconds
+            result.append(1/(diff/10000))
+        else:
+            result.append(0)
+        popularity = cart.objects.filter(item__item=i).count()/cart.objects.all().count()
+        result.append(popularity)
+        attractability_score = result[0]*weight + result[1]*(1-weight)
+        all_attractability.append(attractability_score)
+    return(list(reversed([all_inventory[all_attractability.index(i)] for i in sorted(all_attractability)])))
 
 #uncomment to enable telegram updates
 """ def telegram_bot_sendtext(bot_message):
@@ -305,7 +333,7 @@ def pagination(request, x):
 @login_required(login_url="/r'^loginsjb/$'")
 @group_required('sjb')
 def item_list(request):
-    all_inventory = list(Item.objects.all())
+    all_inventory = orderfaitems()
     all_itemsincart = list(cart.objects.filter(archived=False))
     #check if cart has both deposit and withdraw items
     #ascertain if it is a deposit/withdraw cart
