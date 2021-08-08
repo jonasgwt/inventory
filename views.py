@@ -51,19 +51,54 @@ def orderfaitems():
     #adjust weight here (higher weight means more emphasis on time sorting) (weight must be < 1)
     weight = 0.1
     for i in all_inventory:
-        i_expiry_list=[]
         #median time, popularity
         result=[]
+        #calculate time score
         if i.avg_transact_time:
             diff = abs(datetime.datetime.combine(datetime.datetime.today(), now) - datetime.datetime.combine(datetime.datetime.today(), i.avg_transact_time)).seconds
             result.append(1/(diff/10000))
         else:
             result.append(0)
+        #calculate popularity score
         popularity = (cart.objects.filter(item__item=i).count() + loancart.objects.filter(item__item=i).count())/(cart.objects.all().count()+ loancart.objects.all().count())
         result.append(popularity)
+        #total score
         attractability_score = result[0]*weight + result[1]*(1-weight)
         all_attractability.append(attractability_score)
     return(list(reversed([all_inventory[all_attractability.index(i)] for i in sorted(all_attractability)])))
+
+def orderkits():
+    all_kits = kits.objects.all()
+    attractability_scores=[]
+    now = datetime.datetime.now().time()
+    #adjust weight here (higher weight means more emphasis on time sorting) (weight must be < 1)
+    weight = 0.1
+    for k in all_kits:
+        #median time, popularity
+        result=[]
+        #calculate time score
+        if k.avg_transact_time:
+            diff = abs(datetime.datetime.combine(datetime.datetime.today(), now) - datetime.datetime.combine(datetime.datetime.today(), k.avg_transact_time)).seconds
+            result.append(1/(diff/10000))
+        else:
+            result.append(0)
+        popularity = kit_transactions.objects.filter(kit=k).count()/kit_transactions.objects.all().count()
+        result.append(popularity)
+        attractability_score = result[0]*weight + result[1]*(1-weight)
+        attractability_scores.append(attractability_score)
+    return(list(reversed([all_kits[attractability_scores.index(i)] for i in sorted(attractability_scores)])))
+
+def update_kit_transact_time(transaction, type):
+    target_kit = transaction.kit
+    kit_expiry_list=[]
+    for t in kit_transactions.objects.filter(kit=target_kit).values_list('time', flat=True).order_by('time__hour', 'time__minute'):
+        kit_expiry_list.append(t.time())
+    if type == 'delete':
+        kit_expiry_list.remove(transaction.time.time())
+    if len(kit_expiry_list)>0:
+            median = sorted(kit_expiry_list)[round(len(kit_expiry_list)/2)]
+            target_kit.avg_transact_time = str(median)
+            target_kit.save()
 
 def update_transact_time(order, type):
     loan = False
@@ -1558,7 +1593,7 @@ def orderlogs(request):
 @login_required(login_url="/r'^loginsjb/$'")
 @group_required('sjb')    
 def kits_list(request):
-    all_kits = kits.objects.all()
+    all_kits = orderkits()
     all_itemsincart = list(kitloancart.objects.filter(archived=False))
     categories = ["Available", "Unstocked", "In Use"]
     if len(all_itemsincart) > 0:
@@ -1851,6 +1886,7 @@ def kits_restock(request, item):
                 #add to transactions
                 new_transaction = kit_transactions(type="Restocking", restock_order = neworder, ordering_account=request.user, kit = item_object)
                 new_transaction.save()
+                update_kit_transact_time(new_transaction, '')
                 #check status of the newly stocked kit
                 listitems = list(item_object.items.all())
                 completereplenish= True
@@ -1942,6 +1978,7 @@ def kits_return(request,item):
                     #add to transactions
                     new_transaction = kit_transactions(type="Returning", kitloancart = newreturncart, ordering_account=request.user, kit = kit_object)
                     new_transaction.save()
+                    update_kit_transact_time(new_transaction, '')
                     #Report to telebot
                     messagetele="\U00002795<u><b>Kit "+kit_object.name+" Returned</b></u>\U00002795\n\nKit is now Available\nReturned by: "+request.user.username+"\n\n<code>Kit Transaction No.: "+str(new_transaction.id)+"</code>"
                     telegram_bot_sendtext(messagetele)
@@ -2073,6 +2110,7 @@ def kits_return(request,item):
                     #add to transactions
                     new_transaction = kit_transactions(type="Returning and Stocking", kitloancart = newreturncart, restock_order=neworder, ordering_account=request.user, kit = kit_object)
                     new_transaction.save()
+                    update_kit_transact_time(new_transaction, '')
                     #report to telebot
                     messagecart=""
                     for neworderitems in neworder.cart.all():
@@ -2111,6 +2149,7 @@ def kits_return(request,item):
                     #add to transactions
                     new_transaction = kit_transactions(type="Returning of Unstocked", kitloancart = newreturncart, ordering_account=request.user, kit = kit_object)
                     new_transaction.save()
+                    update_kit_transact_time(new_transaction, '')
                     #report to telebot
                     messagetele="\U00002795<u><b>Kit "+kit_object.name+" Returned</b></u>\U00002795\n\nKit is now Returned but Unstocked\n\nReturned by: "+request.user.username+"\n\n<code>Kit Transaction No.: "+str(new_transaction.id)+"\nAuthorised by: "+ request.user.username+"</code>"
                     telegram_bot_sendtext(messagetele)
@@ -2178,6 +2217,7 @@ def kits_activecart(request):
                     #add to transactions
                     new_transaction = kit_transactions(type="Loaning", kitloancart = activeitem, ordering_account=request.user, kit = activeitem.item)
                     new_transaction.save()
+                    update_kit_transact_time(new_transaction, '')
                     if activeitem.item.forced:
                         messagecart += " •  Kit " + activeitem.item.name +"(Forced Withdraw)\n"
                     else:
@@ -2204,6 +2244,7 @@ def kits_activecart(request):
                     #add to transactions
                     new_transaction = kit_transactions(type="Withdrawing", kitloancart = activeitem, ordering_account=request.user, kit = activeitem.item)
                     new_transaction.save()
+                    update_kit_transact_time(new_transaction, '')
                     if activeitem.item.forced:
                         messagecart += " •  Kit " + activeitem.item.name +"(Forced Withdraw)\n"
                     else:
@@ -2410,6 +2451,7 @@ def kitlogs(request):
             #report to telebot
             messagetele="\U0000274C<u><b>Kit Transaction "+str(orderremove.id)+" Removed</b></u>\U0000274C\n\n<code>\nAuthorised by: "+request.user.username+"</code>"
             telegram_bot_sendtext(messagetele)
+            update_kit_transact_time(orderremove, 'delete')
             orderremove.delete()
                         
 
