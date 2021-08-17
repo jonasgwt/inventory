@@ -47,6 +47,7 @@ from .secret import *
 def orderfaitems():
     all_inventory = list(Item.objects.all())
     all_attractability=[]
+    outcome=[]
     now = datetime.datetime.now().time()
     #adjust weight here (higher weight means more emphasis on time sorting) (weight must be < 1)
     weight = 0.1
@@ -65,11 +66,16 @@ def orderfaitems():
         #total score
         attractability_score = result[0]*weight + result[1]*(1-weight)
         all_attractability.append(attractability_score)
-    return(list(reversed([all_inventory[all_attractability.index(i)] for i in sorted(all_attractability)])))
+    zipped = list(zip(all_attractability,all_inventory))
+    zipped.sort(key=lambda x:x[0])
+    for i in reversed(zipped):
+        outcome.append(i[1])
+    return outcome
 
 def orderkits():
     all_kits = kits.objects.all()
     attractability_scores=[]
+    outcome=[]
     now = datetime.datetime.now().time()
     #adjust weight here (higher weight means more emphasis on time sorting) (weight must be < 1)
     weight = 0.1
@@ -86,7 +92,11 @@ def orderkits():
         result.append(popularity)
         attractability_score = result[0]*weight + result[1]*(1-weight)
         attractability_scores.append(attractability_score)
-    return(list(reversed([all_kits[attractability_scores.index(i)] for i in sorted(attractability_scores)])))
+    zipped = list(zip(attractability_scores,all_kits))
+    zipped.sort(key=lambda x:x[0])
+    for i in reversed(zipped):
+        outcome.append(i[1])
+    return outcome
 
 def update_kit_transact_time(transaction, type):
     target_kit = transaction.kit
@@ -389,6 +399,7 @@ def pagination(request, x):
 @group_required('sjb')
 def item_list(request):
     all_inventory = orderfaitems()
+    print(all_inventory, "here")
     all_itemsincart = list(cart.objects.filter(archived=False))
     #check if cart has both deposit and withdraw items
     #ascertain if it is a deposit/withdraw cart
