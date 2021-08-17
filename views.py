@@ -399,7 +399,6 @@ def pagination(request, x):
 @group_required('sjb')
 def item_list(request):
     all_inventory = orderfaitems()
-    print(all_inventory, "here")
     all_itemsincart = list(cart.objects.filter(archived=False))
     #check if cart has both deposit and withdraw items
     #ascertain if it is a deposit/withdraw cart

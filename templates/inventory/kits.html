@@ -925,7 +925,7 @@
 
     <!-- Top settings for small screens -->
     <div id="topsearchnavibardiv" style="margin-bottom: -50px;">
-        <form class="itemcontainer" action="{%url 'kits_list'%}" method="POST" style="justify-content: space-around;margin-top: 10%;">
+        <form class="itemcontainer" action="{%url 'kits_list'%}" method="POST" style="justify-content: space-around;margin-top: 8%;">
         {%csrf_token%}
             {%if itemtype == "all" or itemtype is None%}
                 <button type="button" class="btn btn-outline-success buttonselected" style="border-radius: 25px;" value="all" onclick="changeshownitems(this)">Show All</button>
