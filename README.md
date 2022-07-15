@@ -33,7 +33,7 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][product-screenshot]](https://playground.nhhs-sjb.org/home/)
 
 IMS is a system built to help simplify the task of keeping track items.
 
