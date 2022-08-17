@@ -64,8 +64,7 @@ This system is currently in the final stages of its development and will soon to
 
 You can try the system <a href="https://playground.nhhs-sjb.org/home/">here</a>. However, you would need an account.
 
-Username: sjbuser2<br>
-Password: P@ssw2rd<br>
+
 
 Feel free to try out the system, as the demo site is running on a seperate database from the deployed site.
 
